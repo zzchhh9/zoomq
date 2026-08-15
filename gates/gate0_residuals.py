@@ -325,6 +325,17 @@ def optimal_knots(a: np.ndarray, j: int) -> tuple[np.ndarray, np.ndarray]:
     return recon, knots
 
 
+def yaml_block(w_tab: np.ndarray) -> str:
+    """Paste-ready `w_schedule:` block for cfgs/config_zoomq_bigym.yaml."""
+    lines = ["  # Gate 0 per-(round, dim) residual windows: w[r][d] = 1.5 * p99(|a[t] - p_t|),",
+             "  # clamped into [0.005, 1.0]. Row r = round r, column d = action dim d.",
+             "  w_schedule:"]
+    for r, row in enumerate(w_tab):
+        vals = ", ".join(f"{v:.4f}" for v in row)
+        lines.append(f"    - [{vals}]  # round {r}")
+    return "\n".join(lines)
+
+
 # --------------------------------------------------------------------------- #
 # Self-test
 # --------------------------------------------------------------------------- #
@@ -408,6 +419,8 @@ def main(argv=None) -> int:
     p.add_argument("--exec-match-tol", type=float, default=0.05, help="zoomq exec_match_tol")
     p.add_argument("--target-rmse", type=float, default=0.05, help="threshold defining j*")
     p.add_argument("--window-scale", type=float, default=1.5, help="w_r = scale * p99(|e|)")
+    p.add_argument("--w-min", type=float, default=0.005, help="lower clamp on w_table entries")
+    p.add_argument("--w-max", type=float, default=1.0, help="upper clamp on w_table entries")
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--out-json", default="/mnt/workspace/zoomq/gates/gate0_results.json")
     p.add_argument("--out-md", default="/mnt/workspace/zoomq/gates/gate0_report.md")
@@ -471,6 +484,51 @@ def main(argv=None) -> int:
         per_round_per_dim[f"round_{r}"] = [abs_stats(resid_all[:, knots, d]) for d in range(dim)]
 
     per_dim_round1 = per_round_per_dim["round_1"]
+
+    # ---- (1b) per-(round, dim) window table ------------------------------- #
+    # w[r][d] = 1.5 * p99(|e|) over round r's knots and dim d only; round 0 is
+    # the full range.  Clamped into [w_min, w_max].
+    w_raw = np.ones((R, dim), dtype=np.float64)
+    for r in range(1, R):
+        for d in range(dim):
+            w_raw[r, d] = args.window_scale * per_round_per_dim[f"round_{r}"][d]["p99"]
+    w_tab = np.clip(w_raw, args.w_min, args.w_max)
+    clamped_lo = [[int(r), int(d)] for r in range(R) for d in range(dim) if w_raw[r, d] < args.w_min]
+    clamped_hi = [[int(r), int(d)] for r in range(R) for d in range(dim) if w_raw[r, d] > args.w_max]
+
+    # dimension classification
+    dim_classes = []
+    for d in range(dim):
+        nu = int(np.unique(chunks[:, :, d]).size)
+        cls = "dead" if nu <= 1 else ("binary" if nu == 2 else "continuous")
+        dim_classes.append(
+            dict(dim=d, n_unique_in_chunks=nu, n_unique_in_episodes=per_dim_nuniq[d],
+                 min=float(chunks[:, :, d].min()), max=float(chunks[:, :, d].max()), cls=cls)
+        )
+    binary_dims = [c["dim"] for c in dim_classes if c["cls"] == "binary"]
+    dead_dims = [c["dim"] for c in dim_classes if c["cls"] == "dead"]
+
+    # ---- (3b) predicted clamp rates --------------------------------------- #
+    # Faithful to zoomq.py: the window is centred on p_t, and for round-0 knots
+    # p = 0 with the full [-1, 1] range, so those cells can never clamp.
+    e_clamp = resid_all.copy()
+    for t in rounds[0]:
+        e_clamp[:, t, :] = chunks[:, t, :]
+    ae = np.abs(e_clamp)
+    w_scalar_t = np.asarray([w_schedule[sched["round_of_t"][t]] for t in range(T)])
+    clamp_scalar = ae > w_scalar_t.reshape(1, T, 1)
+    clamp_table = ae > w_tab[sched["round_of_t"]].reshape(1, T, dim)
+
+    def clamp_report(mask):
+        per_round, per_rd = {}, {}
+        for r in range(R):
+            ks = rounds[r]
+            per_round[str(r)] = float(mask[:, ks, :].mean())
+            per_rd[str(r)] = [float(mask[:, ks, d].mean()) for d in range(dim)]
+        return dict(pooled=float(mask.mean()), per_round=per_round, per_round_per_dim=per_rd)
+
+    cr_scalar = clamp_report(clamp_scalar)
+    cr_table = clamp_report(clamp_table)
 
     # per-round-0 note
     residuals["round_0"] = dict(
@@ -622,6 +680,33 @@ def main(argv=None) -> int:
         smoothness_ratio_dyadic_over_demo=inside,
         exec_match_fraction=exec_frac,
         exec_match_fraction_split=exec_frac_split,
+        w_table_per_dim=dict(
+            description=(
+                "w[r][d] = window_scale * p99(|a[t] - p_t|) over round r's knots and action "
+                "dim d only, clamped into [w_min, w_max]; round 0 is the full range (1.0). "
+                "Rows are rounds 0..R-1, columns are dims 0..D-1."
+            ),
+            window_scale=args.window_scale,
+            w_min=args.w_min,
+            w_max=args.w_max,
+            w_table=[[float(x) for x in row] for row in w_tab],
+            w_table_rounded=[[round(float(x), 4) for x in row] for row in w_tab],
+            w_table_unclamped=[[float(x) for x in row] for row in w_raw],
+            clamped_to_min=clamped_lo,
+            clamped_to_max=clamped_hi,
+            dim_classification=dim_classes,
+            binary_dims=binary_dims,
+            dead_dims=dead_dims,
+            clamp_rate_scalar_w_schedule=cr_scalar,
+            clamp_rate_per_dim_w_table=cr_table,
+            scalar_w_schedule_used=w_schedule,
+            exec_match_fraction_unchanged=True,
+            exec_match_fraction_note=(
+                "exec_n_r depends only on the dyadic reconstruction RMSE, which never reads the "
+                "windows, so the per-dim table leaves it identical to exec_match_fraction."
+            ),
+            yaml_block=yaml_block(w_tab),
+        ),
     )
 
     Path(args.out_json).parent.mkdir(parents=True, exist_ok=True)
@@ -743,7 +828,71 @@ def write_report(path: str, res: dict, args) -> None:
       "itself is a knot.\n")
     A("Predicted `exec_n_r` = `[" + ", ".join(f"{f:.4f}" for f in res["exec_match_fraction"]) + "]`\n")
 
-    A("## 5. Verdict\n")
+    A("## 5. Per-(round, dim) window table\n")
+    wt = res["w_table_per_dim"]
+    A(f"`w[r][d] = {wt['window_scale']} * p99(|e|)` over round r's knots and dim d only, "
+      f"clamped into [{wt['w_min']}, {wt['w_max']}]; round 0 is the full range.\n")
+    A("| round | " + " | ".join(f"d{d}" for d in range(len(wt["w_table"][0]))) + " |")
+    A("|---" * (len(wt["w_table"][0]) + 1) + "|")
+    for r, row in enumerate(wt["w_table_rounded"]):
+        A(f"| {r} | " + " | ".join(f"{v:.4f}" for v in row) + " |")
+    A("")
+    A(f"- Clamped UP to {wt['w_min']} (round, dim): {wt['clamped_to_min']}")
+    A(f"- Clamped DOWN to {wt['w_max']} (round, dim): {wt['clamped_to_max']}\n")
+
+    A("### Dimension classification\n")
+    A("| dim | distinct values in chunks | min | max | class |")
+    A("|---|---|---|---|---|")
+    for c in wt["dim_classification"]:
+        A(f"| {c['dim']} | {c['n_unique_in_chunks']} | {c['min']:.4f} | {c['max']:.4f} | **{c['cls']}** |")
+    A("")
+    A(f"Binary dims: {wt['binary_dims']}; dead dims: {wt['dead_dims']}; all others continuous.\n")
+
+    A("### Predicted clamp rate: scalar per-round `w` vs per-dim `w_table`\n")
+    cs, ct = wt["clamp_rate_scalar_w_schedule"], wt["clamp_rate_per_dim_w_table"]
+    A(f"Scalar `w_schedule` = `{[round(x, 4) for x in wt['scalar_w_schedule_used']]}`\n")
+    A("| round | clamp rate, scalar w | clamp rate, per-dim w_table |")
+    A("|---|---|---|")
+    for r in sorted(cs["per_round"], key=int):
+        A(f"| {r} | {cs['per_round'][r]:.6f} | {ct['per_round'][r]:.6f} |")
+    A(f"| **pooled (all cells)** | **{cs['pooled']:.6f}** | **{ct['pooled']:.6f}** |")
+    A("")
+    A("(Round-0 cells are centred on p = 0 with the full range, so they can never clamp — "
+      "they dilute the pooled figure, exactly as in the training code's `clamp_rate`.)\n")
+
+    A("**Does the pooled number hide per-round mis-specification? Yes.** Worst cells under "
+      "each setting, as a multiple of that setting's pooled rate:\n")
+    A("| setting | pooled | worst round | binary dim 13, worst round | worst continuous dim |")
+    A("|---|---|---|---|---|")
+    for name, c in (("scalar per-round w", cs), ("per-dim w_table", ct)):
+        rr = {r: c["per_round"][r] for r in c["per_round"]}
+        wr = max(rr, key=lambda r: rr[r])
+        d13 = {r: c["per_round_per_dim"][r][13] for r in c["per_round_per_dim"]}
+        wd13 = max(d13, key=lambda r: d13[r])
+        best = (None, None, -1.0)
+        for r in c["per_round_per_dim"]:
+            for d in wt["dim_classification"]:
+                if d["cls"] != "continuous":
+                    continue
+                v = c["per_round_per_dim"][r][d["dim"]]
+                if v > best[2]:
+                    best = (r, d["dim"], v)
+        p = c["pooled"] if c["pooled"] > 0 else float("nan")
+        A(f"| {name} | {c['pooled']:.6f} | r{wr} {rr[wr]:.6f} ({rr[wr]/p:.1f}x) | "
+          f"r{wd13} {d13[wd13]:.6f} ({d13[wd13]/p:.1f}x) | "
+          f"r{best[0]} d{best[1]} {best[2]:.6f} ({best[2]/p:.1f}x) |")
+    A("")
+
+    A("### Predicted `exec_n_r` under the per-dim table\n")
+    A("**Unchanged: `[" + ", ".join(f"{f:.4f}" for f in res["exec_match_fraction"]) + "]`.** "
+      + wt["exec_match_fraction_note"] + "\n")
+
+    A("### YAML to paste under `zoomq:` in `cfgs/config_zoomq_bigym.yaml`\n")
+    A("```yaml")
+    A(wt["yaml_block"])
+    A("```\n")
+
+    A("## 6. Verdict\n")
     A(verdict(res, args))
     Path(path).write_text("\n".join(L) + "\n")
 

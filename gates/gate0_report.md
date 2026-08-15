@@ -103,6 +103,82 @@ A binary dim toggles inside 0.1253 of chunks; no interpolation through knots can
 
 Predicted `exec_n_r` = `[0.6273, 0.8638, 0.8734, 0.8817, 1.0000]`
 
-## 5. Verdict
+## 5. Per-(round, dim) window table
+
+`w[r][d] = 1.5 * p99(|e|)` over round r's knots and dim d only, clamped into [0.005, 1.0]; round 0 is the full range.
+
+| round | d0 | d1 | d2 | d3 | d4 | d5 | d6 | d7 | d8 | d9 | d10 | d11 | d12 | d13 | d14 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 0 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| 1 | 0.2937 | 0.6119 | 0.2680 | 0.1868 | 0.3191 | 0.4030 | 0.3183 | 0.3673 | 0.1423 | 0.3198 | 0.2764 | 0.2009 | 0.2909 | 1.0000 | 0.0050 |
+| 2 | 0.1025 | 0.2721 | 0.1039 | 0.0637 | 0.1007 | 0.1247 | 0.1037 | 0.2280 | 0.0431 | 0.1013 | 0.0838 | 0.0637 | 0.1337 | 1.0000 | 0.0050 |
+| 3 | 0.0352 | 0.1106 | 0.0368 | 0.0229 | 0.0371 | 0.0461 | 0.0344 | 0.1417 | 0.0162 | 0.0327 | 0.0278 | 0.0219 | 0.0681 | 1.0000 | 0.0050 |
+| 4 | 0.0304 | 0.0794 | 0.0239 | 0.0202 | 0.0343 | 0.0426 | 0.0262 | 0.0820 | 0.0131 | 0.0321 | 0.0274 | 0.0159 | 0.0403 | 1.0000 | 0.0050 |
+
+- Clamped UP to 0.005 (round, dim): [[1, 14], [2, 14], [3, 14], [4, 14]]
+- Clamped DOWN to 1.0 (round, dim): [[1, 13], [2, 13], [3, 13], [4, 13]]
+
+### Dimension classification
+
+| dim | distinct values in chunks | min | max | class |
+|---|---|---|---|---|
+| 0 | 8513 | -1.0000 | 1.0000 | **continuous** |
+| 1 | 8075 | -1.0000 | 1.0000 | **continuous** |
+| 2 | 8458 | -0.7621 | 1.0000 | **continuous** |
+| 3 | 8470 | -1.0000 | 1.0000 | **continuous** |
+| 4 | 8469 | -1.0000 | 1.0000 | **continuous** |
+| 5 | 8471 | -1.0000 | 1.0000 | **continuous** |
+| 6 | 8469 | -1.0000 | 1.0000 | **continuous** |
+| 7 | 8472 | -1.0000 | 1.0000 | **continuous** |
+| 8 | 8467 | -1.0000 | 1.0000 | **continuous** |
+| 9 | 8456 | -1.0000 | 1.0000 | **continuous** |
+| 10 | 8467 | -1.0000 | 1.0000 | **continuous** |
+| 11 | 8469 | -1.0000 | 1.0000 | **continuous** |
+| 12 | 8470 | -1.0000 | 1.0000 | **continuous** |
+| 13 | 2 | -1.0000 | 1.0000 | **binary** |
+| 14 | 1 | -1.0000 | -1.0000 | **dead** |
+
+Binary dims: [13]; dead dims: [14]; all others continuous.
+
+### Predicted clamp rate: scalar per-round `w` vs per-dim `w_table`
+
+Scalar `w_schedule` = `[1.0, 0.5794, 0.1624, 0.0596, 0.0395]`
+
+| round | clamp rate, scalar w | clamp rate, per-dim w_table |
+|---|---|---|
+| 0 | 0.000000 | 0.000000 |
+| 1 | 0.008605 | 0.004774 |
+| 2 | 0.006395 | 0.002776 |
+| 3 | 0.005883 | 0.002942 |
+| 4 | 0.004503 | 0.002150 |
+| **pooled (all cells)** | **0.004778** | **0.002321** |
+
+(Round-0 cells are centred on p = 0 with the full range, so they can never clamp — they dilute the pooled figure, exactly as in the training code's `clamp_rate`.)
+
+**Does the pooled number hide per-round mis-specification? Yes.** Worst cells under each setting, as a multiple of that setting's pooled rate:
+
+| setting | pooled | worst round | binary dim 13, worst round | worst continuous dim |
+|---|---|---|---|---|
+| scalar per-round w | 0.004778 | r1 0.008605 (1.8x) | r1 0.125308 (26.2x) | r3 d7 0.028927 (6.1x) |
+| per-dim w_table | 0.002321 | r1 0.004774 (2.1x) | r1 0.049034 (21.1x) | r3 d12 0.006583 (2.8x) |
+
+### Predicted `exec_n_r` under the per-dim table
+
+**Unchanged: `[0.6273, 0.8638, 0.8734, 0.8817, 1.0000]`.** exec_n_r depends only on the dyadic reconstruction RMSE, which never reads the windows, so the per-dim table leaves it identical to exec_match_fraction.
+
+### YAML to paste under `zoomq:` in `cfgs/config_zoomq_bigym.yaml`
+
+```yaml
+  # Gate 0 per-(round, dim) residual windows: w[r][d] = 1.5 * p99(|a[t] - p_t|),
+  # clamped into [0.005, 1.0]. Row r = round r, column d = action dim d.
+  w_schedule:
+    - [1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000]  # round 0
+    - [0.2937, 0.6119, 0.2680, 0.1868, 0.3191, 0.4030, 0.3183, 0.3673, 0.1423, 0.3198, 0.2764, 0.2009, 0.2909, 1.0000, 0.0050]  # round 1
+    - [0.1025, 0.2721, 0.1039, 0.0637, 0.1007, 0.1247, 0.1037, 0.2280, 0.0431, 0.1013, 0.0838, 0.0637, 0.1337, 1.0000, 0.0050]  # round 2
+    - [0.0352, 0.1106, 0.0368, 0.0229, 0.0371, 0.0461, 0.0344, 0.1417, 0.0162, 0.0327, 0.0278, 0.0219, 0.0681, 1.0000, 0.0050]  # round 3
+    - [0.0304, 0.0794, 0.0239, 0.0202, 0.0343, 0.0426, 0.0262, 0.0820, 0.0131, 0.0321, 0.0274, 0.0159, 0.0403, 1.0000, 0.0050]  # round 4
+```
+
+## 6. Verdict
 
 Measured on real demonstrations, the residual windows the dyadic codec actually needs are `[1.0000, 0.5794, 0.1624, 0.0596, 0.0395]` for rounds 0-4, i.e. 3.86x, 2.03x, 1.49x, 1.97x the proposal's illustrative w = (0.15, 0.08, 0.04, 0.02) for rounds 1-4. Dropping the binary/dead dims [13, 14] gives `[1.0000, 0.3887, 0.1353, 0.0568, 0.0398]` (2.59x, 1.69x, 1.42x, 1.99x the proposal), so the discrepancy at the coarse rounds is driven by the binary gripper dimension, which no interpolation window can shrink. Reconstruction error falls from 0.0610 (j=2) to 0.0303 (j=3), 0.0176 (j=5) and 0.0106 (j=9) under the fixed dyadic schedule; the optimal DP placement reaches 0.0219 / 0.0048 / 0.0020 at the same budgets, so the cost of the fixed schedule is +0.0129 RMSE at j=5. j* = 3 (dyadic) and 3 (optimal DP) at the 0.05 threshold, against the proposal's claim of RMSE 0.0252 at four knots (j*=4); the dyadic schedule has no 4-knot member, and its nearest budgets bracket that claim at 0.0303 (j=3) and 0.0176 (j=5). At exactly four knots the fixed uniform set [0, 5, 10, 15] gives 0.0215 and the optimal DP placement gives 0.0074, versus the proposal's 0.0252. The exec-match predicate at tol=0.05 admits 0.627, 0.864, 0.873, 0.882, 1.000 of demo chunks at rounds 0-4, which is what the `exec_n_r` counters should log.
