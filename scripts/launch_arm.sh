@@ -13,9 +13,18 @@
 #     nothing tonight; snapshot.pt (resume) is still written.
 set -euo pipefail
 
-ARM="${1:?usage: launch_arm.sh <ARM> <PPU> [overrides...]}"
-PPU="${2:?usage: launch_arm.sh <ARM> <PPU> [overrides...]}"
-shift 2
+# CONFIG is a hydra --config-name (use "-" for the stock CQN-AS config). It has
+# to be a separate argument because hydra's argparse rejects flags that appear
+# after positional overrides.
+ARM="${1:?usage: launch_arm.sh <ARM> <PPU> <CONFIG|-> [overrides...]}"
+PPU="${2:?usage: launch_arm.sh <ARM> <PPU> <CONFIG|-> [overrides...]}"
+CONFIG="${3:?usage: launch_arm.sh <ARM> <PPU> <CONFIG|-> [overrides...]}"
+shift 3
+
+CONFIG_ARGS=()
+if [ "${CONFIG}" != "-" ]; then
+  CONFIG_ARGS=(--config-name="${CONFIG}")
+fi
 
 REPO=/mnt/workspace/zoomq/third_party/CQN-AS-G1
 RUNS=/mnt/workspace/zoomq/runs
@@ -36,6 +45,7 @@ mkdir -p "${RUNS}"
 cd "${REPO}"
 
 exec "${PY}" train_cqn_as_bigym.py \
+  ${CONFIG_ARGS[@]+"${CONFIG_ARGS[@]}"} \
   seed=1 \
   save_snapshot=true save_eval_snapshot=false \
   num_eval_episodes=10 eval_every_frames=2500 \
