@@ -22,7 +22,8 @@ ZQ_KEYS = [
     "exec_q_0", "exec_q_1", "exec_q_2", "exec_q_3", "exec_q_4",
     "exec_td_err_0", "exec_td_err_1", "exec_td_err_2", "exec_td_err_3", "exec_td_err_4",
     "skeleton_rmse_0", "skeleton_rmse_1", "skeleton_rmse_2", "skeleton_rmse_3",
-    "window_clamp_rate", "refine_target_mass", "consistency_drift",
+    "window_clamp_rate", "refine_target_mass", "bellman_target_mass",
+    "refine_target_q", "bellman_target_q", "consistency_drift",
     "eps_depth_current", "delta_over_kappa_u_p10", "delta_over_kappa_u_p50",
     "delta_over_kappa_u_p90", "zoomq_exec_loss", "zoomq_refine_loss",
 ]
@@ -114,8 +115,14 @@ def main():
                              "the F5 refine-backup bug, or simply no reward signal)")
             if ds[-1] > 0.99:
                 flags.append("depth pinned at max round")
-            if abs(zq.get("refine_target_mass", 1.0) - 1.0) > 1e-3:
-                flags.append("refine target mass != 1 -> projection leaked into eq. (2)")
+            rm = zq.get("refine_target_mass", float("nan"))
+            bm = zq.get("bellman_target_mass", float("nan"))
+            # The invariant is refine==bellman. Both sit slightly above 1 because
+            # the baseline's C51 projection duplicates mass on exact-atom hits
+            # (c51_exact_atom_fix: false), which is kept for comparability.
+            if math.isfinite(rm) and math.isfinite(bm) and abs(rm - bm) > 1e-3:
+                flags.append(f"refine mass {rm:.4f} != bellman mass {bm:.4f} "
+                             "-> a projection leaked into the refine backup (eq. 2)")
             if zq.get("window_clamp_rate", 0.0) > 0.05:
                 flags.append("clamp rate > 5% -> windows mis-specified, the run is "
                              "measuring a clipped object")
