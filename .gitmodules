@@ -1,0 +1,4 @@
+[submodule "third_party/CQN-AS-G1"]
+	path = third_party/CQN-AS-G1
+	url = git@github.com:zzchhh9/CQN-AS-G1.git
+	branch = zoomq
