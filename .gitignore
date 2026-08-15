@@ -1,0 +1,11 @@
+runs/
+*.pt
+*.pth
+*.log
+*.npz
+wandb/
+__pycache__/
+*.pyc
+.venv/
+outputs/
+exp_local/
