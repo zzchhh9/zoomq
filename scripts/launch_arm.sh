@@ -21,7 +21,13 @@ REPO=/mnt/workspace/zoomq/third_party/CQN-AS-G1
 RUNS=/mnt/workspace/zoomq/runs
 PY=/mnt/workspace/anchorq/.venv/bin/python
 
+# The PPU SDK's envsetup.sh leaves a non-zero status and references unset vars,
+# so errexit/nounset have to stand down for exactly this line. Without the
+# sourcing, torch dies with `cannot open the file:libhggcrt1.so`.
+set +eu
 source /usr/local/PPU_SDK/envsetup.sh >/dev/null 2>&1
+set -eu
+
 export MUJOCO_GL=egl
 export OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 NUMEXPR_NUM_THREADS=4
 export CUDA_VISIBLE_DEVICES="${PPU}"
