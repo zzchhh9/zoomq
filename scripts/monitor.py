@@ -117,12 +117,24 @@ def main():
                 flags.append("depth pinned at max round")
             rm = zq.get("refine_target_mass", float("nan"))
             bm = zq.get("bellman_target_mass", float("nan"))
-            # The invariant is refine==bellman. Both sit slightly above 1 because
-            # the baseline's C51 projection duplicates mass on exact-atom hits
-            # (c51_exact_atom_fix: false), which is kept for comparability.
-            if math.isfinite(rm) and math.isfinite(bm) and abs(rm - bm) > 1e-3:
-                flags.append(f"refine mass {rm:.4f} != bellman mass {bm:.4f} "
-                             "-> a projection leaked into the refine backup (eq. 2)")
+            # Every refine target is either a copied exec distribution (mass
+            # exactly 1) or the Bellman leaf, whose mass sits slightly above 1
+            # because the baseline's C51 projection duplicates mass on
+            # exact-atom hits (c51_exact_atom_fix: false, kept so arm C stays
+            # comparable to arm B). So refine mass must lie between the two.
+            # The F5 bug would instead give a delta at V=0 with mass ~2.
+            if math.isfinite(rm) and math.isfinite(bm):
+                lo, hi = min(1.0, bm) - 1e-3, max(1.0, bm) + 1e-3
+                if not (lo <= rm <= hi):
+                    flags.append(
+                        f"refine mass {rm:.4f} outside [1.0, bellman {bm:.4f}] "
+                        "-> a projection leaked into the refine backup (eq. 2)")
+                elif bm > 1.0 + 1e-6:
+                    # how often W_r = Q^exec_r beat the child, inferred from the
+                    # mixture: exec branches contribute mass 1, the leaf mass bm
+                    share = max(0.0, min(1.0, (bm - rm) / (bm - 1.0)))
+                    print(f"   exec-branch share of refine targets ~ {share:.3f} "
+                          "(derived from the mass mixture)")
             if zq.get("window_clamp_rate", 0.0) > 0.05:
                 flags.append("clamp rate > 5% -> windows mis-specified, the run is "
                              "measuring a clipped object")
