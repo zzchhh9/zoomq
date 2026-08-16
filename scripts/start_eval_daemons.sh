@@ -37,6 +37,9 @@ source /usr/local/PPU_SDK/envsetup.sh >/dev/null 2>&1
 set -eu
 
 export MUJOCO_GL=egl
+# EGL enumerates a single device here, so pin index 0; reeval otherwise derives
+# it from --gpus and mujoco refuses to start.
+export MUJOCO_EGL_DEVICE_ID=0
 export HOME=/mnt/workspace/zoomq/demos
 export PYTHONUSERBASE=/root/.local
 export EVAL_PYTHON=/mnt/workspace/anchorq/.venv/bin/python
