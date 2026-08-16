@@ -5,25 +5,32 @@
 #
 # The training arms run with `in_train_eval=false save_eval_snapshot=true`
 # (CLAUDE.md's LAUNCH RULE), so they write a snapshot every 10k frames and pay
-# no evaluation cost. This starts two `eval_daemon.py` instances that poll for
-# new snapshots and score them on the otherwise-idle cores.
+# no evaluation cost. This starts daemons that poll for new snapshots and score
+# them on the otherwise-idle cores.
 #
 # --episodes 25 is CQN-AS's own reporting protocol ("success rate over 25
-#   episodes"), which is what the numbers in main.tex Table 1 are.
-# --videos 0 because a video eval has crashed a run here before with
-#   EGLError (eglDestroyContext).
-# Job counts are sized to leave the 30 training arms their ~89 cores: each eval
-#   job is a full trainer process in eval_only mode.
+#   episodes"), which is what main.tex Table 1's numbers are.
+# --videos 0 because a video eval has crashed a run here before with EGLError.
+# --train-script is passed explicitly: these runs live in a dedicated results
+#   tree, not exp_local/<method_dir>/, and the daemon otherwise skips them
+#   forever with "unknown method dir" while looking perfectly healthy.
+#
+# SPREAD ACROSS CARDS, FEW JOBS EACH. A first attempt pinned 8 and 16 eval jobs
+# to single PPUs and they died with `cudaGetDeviceCount ... out of memory` /
+# `driver shutting down`: the cards were at only 25-28 GB of 98 GB, so this is
+# context exhaustion, not memory. Training already places ~34 processes per card
+# (each arm plus its 8 dataloader workers inherit CUDA_VISIBLE_DEVICES), so eval
+# gets 4 jobs each on the least-loaded cards.
 #
 # The daemon spawns children with the inherited environment, so HOME (which is
-# what bigym derives its demonstration cache from) and PYTHONUSERBASE (which is
-# where mujoco lives, and is also derived from HOME) must both be exported here
-# or the children look in the wrong cache and fail to import.
+# what bigym derives its demonstration cache from) and PYTHONUSERBASE (where
+# mujoco lives, also derived from HOME) must both be exported here.
 set -euo pipefail
 
 REPO=/mnt/workspace/zoomq/third_party/CQN-AS-G1
 RUNS=/mnt/workspace/zoomq/runs
 LOGS=/mnt/workspace/zoomq/logs
+JOBS="${JOBS:-4}"
 
 set +eu
 source /usr/local/PPU_SDK/envsetup.sh >/dev/null 2>&1
@@ -37,31 +44,27 @@ export OMP_NUM_THREADS=2 MKL_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 NUMEXPR_NUM_TH
 
 cd "$REPO"
 
-p1_paths=()
-for a in p1_mp_s1 p1_mp_s2 p1_mp_s3 p1_sh_s1 p1_sh_s2 p1_sh_s3; do
-  p1_paths+=(--path "$RUNS/$a")
-done
+# start_group <name> <gpu> <run...>
+start_group() {
+  local name="$1" gpu="$2"; shift 2
+  local paths=()
+  for a in "$@"; do paths+=(--path "$RUNS/$a"); done
+  setsid nohup "$EVAL_PYTHON" scripts/eval_daemon.py \
+    --gpu "$gpu" --jobs "$JOBS" --episodes 25 --videos 0 --oldest-first \
+    --train-script train_cqn_as_bigym.py \
+    "${paths[@]}" > "$LOGS/evald_${name}.log" 2>&1 < /dev/null &
+  sleep 1
+}
 
-p2_paths=()
-for t in tc pc du fc; do
-  for m in base zqA zqF; do
-    for s in 1 2; do
-      p2_paths+=(--path "$RUNS/p2_${t}_${m}_s${s}")
-    done
-  done
-done
-
-# Phase 1 is the gate, so it gets its own daemon and is never starved by the
+# Phase 1 is the gate, so it gets its own cards and is never queued behind the
 # much longer Phase 2 episodes.
-setsid nohup "$EVAL_PYTHON" scripts/eval_daemon.py \
-  --gpu 0 --jobs 8 --episodes 25 --videos 0 --oldest-first \
-  --train-script train_cqn_as_bigym.py \
-  "${p1_paths[@]}" > "$LOGS/evald_p1.log" 2>&1 < /dev/null &
+start_group p1a 15 p1_mp_s1 p1_mp_s2 p1_mp_s3
+start_group p1b 14 p1_sh_s1 p1_sh_s2 p1_sh_s3
 
-setsid nohup "$EVAL_PYTHON" scripts/eval_daemon.py \
-  --gpu 1 --jobs 16 --episodes 25 --videos 0 --oldest-first \
-  --train-script train_cqn_as_bigym.py \
-  "${p2_paths[@]}" > "$LOGS/evald_p2.log" 2>&1 < /dev/null &
+start_group p2a 13 p2_tc_base_s1 p2_tc_base_s2 p2_tc_zqA_s1 p2_tc_zqA_s2 p2_tc_zqF_s1 p2_tc_zqF_s2
+start_group p2b 12 p2_pc_base_s1 p2_pc_base_s2 p2_pc_zqA_s1 p2_pc_zqA_s2 p2_pc_zqF_s1 p2_pc_zqF_s2
+start_group p2c 11 p2_du_base_s1 p2_du_base_s2 p2_du_zqA_s1 p2_du_zqA_s2 p2_du_zqF_s1 p2_du_zqF_s2
+start_group p2d 10 p2_fc_base_s1 p2_fc_base_s2 p2_fc_zqA_s1 p2_fc_zqA_s2 p2_fc_zqF_s1 p2_fc_zqF_s2
 
 sleep 3
-echo "started: eval daemon p1 (6 runs, 8 jobs) + p2 (24 runs, 16 jobs)"
+echo "started 6 eval daemons (${JOBS} jobs each) across PPUs 10-15"
