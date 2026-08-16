@@ -8,7 +8,8 @@
 #     /mnt/workspace/CQN-AS-G1, the pi05-baseline tree with a live eval fleet).
 #   save_video / save_train_video false  — a video eval once killed a run with
 #     EGLError (eglDestroyContext); the repo default is true.
-#   num_eval_episodes=10               — the repo default is 100.
+#   EVAL_EPS (env, default 10)         — the repo default is 100; CQN-AS's
+#     published protocol reports over 25 episodes.
 #   SEED (env, default 1)              — for parallel multi-seed waves. Runs are
 #     sequential in env steps (~1 frame/s ceiling), so parallelism cannot make
 #     ONE run finish sooner; it can only make the seeds cost one run's wall time
@@ -59,7 +60,7 @@ exec "${PY}" train_cqn_as_bigym.py \
   ${CONFIG_ARGS[@]+"${CONFIG_ARGS[@]}"} \
   seed="${SEED:-1}" \
   save_snapshot=true save_eval_snapshot=false \
-  num_eval_episodes=10 eval_every_frames="${EVAL_EVERY:-2500}" \
+  num_eval_episodes="${EVAL_EPS:-10}" eval_every_frames="${EVAL_EVERY:-2500}" \
   save_video=false save_train_video=false \
   max_eval_success_videos=0 max_eval_failure_videos=0 \
   replay_buffer_num_workers="${WORKERS:-2}" device=cuda \
