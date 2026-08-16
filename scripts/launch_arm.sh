@@ -9,6 +9,10 @@
 #   save_video / save_train_video false  — a video eval once killed a run with
 #     EGLError (eglDestroyContext); the repo default is true.
 #   num_eval_episodes=10               — the repo default is 100.
+#   EVAL_EVERY (env, default 2500)     — an eval is 10 x 300 steps and never
+#     terminates early on a task nobody can score on, so at the default cadence
+#     it costs MORE wall clock than the training it interleaves. Set it high for
+#     arms whose deliverable is the mechanism counters rather than a curve.
 #   save_eval_snapshot=false           — 18 GB/run of eval snapshots buys
 #     nothing tonight; snapshot.pt (resume) is still written.
 set -euo pipefail
@@ -48,7 +52,7 @@ exec "${PY}" train_cqn_as_bigym.py \
   ${CONFIG_ARGS[@]+"${CONFIG_ARGS[@]}"} \
   seed=1 \
   save_snapshot=true save_eval_snapshot=false \
-  num_eval_episodes=10 eval_every_frames=2500 \
+  num_eval_episodes=10 eval_every_frames="${EVAL_EVERY:-2500}" \
   save_video=false save_train_video=false \
   max_eval_success_videos=0 max_eval_failure_videos=0 \
   replay_buffer_num_workers=2 device=cuda \
