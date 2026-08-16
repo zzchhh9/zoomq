@@ -9,6 +9,13 @@
 #   save_video / save_train_video false  — a video eval once killed a run with
 #     EGLError (eglDestroyContext); the repo default is true.
 #   num_eval_episodes=10               — the repo default is 100.
+#   SEED (env, default 1)              — for parallel multi-seed waves. Runs are
+#     sequential in env steps (~1 frame/s ceiling), so parallelism cannot make
+#     ONE run finish sooner; it can only make the seeds cost one run's wall time
+#     instead of N. ali has 184 cores and a wave of ~2.5 cores per arm.
+#   WORKERS (env, default 2)           — replay_buffer_num_workers. Keep it
+#     matched across arms you intend to compare: it changes the sampling
+#     interleaving, hence the RNG stream.
 #   EVAL_EVERY (env, default 2500)     — an eval is 10 x 300 steps and never
 #     terminates early on a task nobody can score on, so at the default cadence
 #     it costs MORE wall clock than the training it interleaves. Set it high for
@@ -50,12 +57,12 @@ cd "${REPO}"
 
 exec "${PY}" train_cqn_as_bigym.py \
   ${CONFIG_ARGS[@]+"${CONFIG_ARGS[@]}"} \
-  seed=1 \
+  seed="${SEED:-1}" \
   save_snapshot=true save_eval_snapshot=false \
   num_eval_episodes=10 eval_every_frames="${EVAL_EVERY:-2500}" \
   save_video=false save_train_video=false \
   max_eval_success_videos=0 max_eval_failure_videos=0 \
-  replay_buffer_num_workers=2 device=cuda \
+  replay_buffer_num_workers="${WORKERS:-2}" device=cuda \
   experiment="zoomq_${ARM}" \
   hydra.run.dir="${RUNS}/${ARM}" \
   "$@"
