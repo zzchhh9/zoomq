@@ -271,6 +271,14 @@ def interp_through(a: np.ndarray, knots: list[int]) -> np.ndarray:
     return al + (ah - al) * w.reshape(1, T, 1)
 
 
+def zoh_through(a: np.ndarray, knots: list[int]) -> np.ndarray:
+    """Zero-order hold: each t takes the value of the latest knot <= t."""
+    T = a.shape[1]
+    ks = sorted(knots)
+    idx = np.asarray([max(k for k in ks if k <= t) for t in range(T)], dtype=np.int64)
+    return a[:, idx]
+
+
 def segment_costs(a: np.ndarray) -> np.ndarray:
     """cost[n, i, k] = summed squared error over t in [i, k] and over D of the
     straight line from a[i] to a[k].  inf for i >= k."""
@@ -323,6 +331,148 @@ def optimal_knots(a: np.ndarray, j: int) -> tuple[np.ndarray, np.ndarray]:
             w = (np.arange(i, k + 1) - i) / span
             recon[ci, i : k + 1] = a[ci, i] + (a[ci, k] - a[ci, i]) * w.reshape(-1, 1)
     return recon, knots
+
+
+COMPARE_MARKER = "## 7. Substrate comparison"
+
+
+def dim_diff(dir_a: str, dir_b: str, action_key: str = "action"):
+    """Per-dim max |difference| between two demo buffers, episodes matched by the
+    trailing ``_<index>_<length>.npz`` id rather than by sort order (the two
+    buffers carry different timestamp prefixes, so sorting misaligns them)."""
+    import re
+
+    def load(d):
+        out = {}
+        for p in Path(d).rglob("*.npz"):
+            m = re.search(r"_(\d+)_(\d+)\.npz$", p.name)
+            if m is None:
+                return None
+            with p.open("rb") as f:
+                out[int(m.group(1))] = np.asarray(np.load(f)[action_key])
+        return out
+
+    a, b = load(dir_a), load(dir_b)
+    if not a or not b or sorted(a) != sorted(b):
+        return None
+    dim = a[next(iter(a))].shape[1]
+    return [
+        float(max(np.abs(a[k][:, d] - b[k][:, d]).max() for k in a)) for d in range(dim)
+    ]
+
+
+def compare_sections(base_json: str, new_json: str, base_label: str, new_label: str) -> str:
+    """Side-by-side section for two gate0 result files (idempotent, replaces itself)."""
+    b = json.loads(Path(base_json).read_text())
+    n = json.loads(Path(new_json).read_text())
+    L = [COMPARE_MARKER + f": {base_label} vs {new_label}\n"]
+    A = L.append
+    A(f"- `{base_label}` = `{b['meta']['demo_dirs'][0]}` "
+      f"({b['meta']['n_chunks_used']} chunks, D={b['meta']['action_dim']})")
+    A(f"- `{new_label}` = `{n['meta']['demo_dirs'][0]}` "
+      f"({n['meta']['n_chunks_used']} chunks, D={n['meta']['action_dim']})\n")
+
+    try:
+        dd = dim_diff(b["meta"]["demo_dirs"][0], n["meta"]["demo_dirs"][0])
+    except Exception:
+        dd = None
+    if dd is not None:
+        changed = [i for i, x in enumerate(dd) if x > 0]
+        A("### Which action dims actually changed between the two substrates\n")
+        A(f"Episode-matched max |difference| per dim: `{[round(x, 4) for x in dd]}`\n")
+        A(f"**Only dims {changed} differ; dims "
+          f"{[i for i in range(len(dd)) if i not in changed]} are bit-identical.**\n")
+
+    A("### Scalar per-round window `w_r = 1.5 * p99(|e|)`\n")
+    A(f"| round | {base_label} | {new_label} | ratio |")
+    A("|---|---|---|---|")
+    for r in range(len(b["w_schedule"])):
+        wb, wn = b["w_schedule"][r], n["w_schedule"][r]
+        A(f"| {r} | {wb:.4f} | {wn:.4f} | {wn / wb:.2f}x |")
+    A("")
+
+    A("### Reconstruction and j*\n")
+    A(f"| j | {base_label} dyadic | {new_label} dyadic | {base_label} optimal | {new_label} optimal |")
+    A("|---|---|---|---|---|")
+    for j in J_VALUES:
+        A(f"| {j} | {b['reconstruction']['dyadic'][str(j)]['rmse_mean']:.4f} | "
+          f"{n['reconstruction']['dyadic'][str(j)]['rmse_mean']:.4f} | "
+          f"{b['reconstruction']['optimal'][str(j)]['rmse_mean']:.4f} | "
+          f"{n['reconstruction']['optimal'][str(j)]['rmse_mean']:.4f} |")
+    A(f"| **j\\*** | **{b['j_star']['dyadic']}** / {b['j_star']['optimal']} | "
+      f"**{n['j_star']['dyadic']}** / {n['j_star']['optimal']} | (dyadic / optimal) | |")
+    A("")
+
+    A("### Predicted `exec_n_r`\n")
+    A(f"| round | {base_label} | {new_label} | delta |")
+    A("|---|---|---|---|")
+    for r in range(len(b["exec_match_fraction"])):
+        fb, fn = b["exec_match_fraction"][r], n["exec_match_fraction"][r]
+        A(f"| {r} | {fb:.4f} | {fn:.4f} | {fn - fb:+.4f} |")
+    A("")
+
+    A("### Dimension classification\n")
+    bw, nw = b["w_table_per_dim"], n["w_table_per_dim"]
+    A(f"| substrate | binary dims | dead dims | continuous dims |")
+    A("|---|---|---|---|")
+    for lab, w in ((base_label, bw), (new_label, nw)):
+        ncont = len(w["dim_classification"]) - len(w["binary_dims"]) - len(w["dead_dims"])
+        A(f"| {lab} | {w['binary_dims']} | {w['dead_dims']} | {ncont} |")
+    A("")
+
+    A("### Linear interpolation vs zero-order hold\n")
+    A(f"| j | {base_label} linear | {base_label} ZOH | {new_label} linear | {new_label} ZOH | ZOH/linear |")
+    A("|---|---|---|---|---|---|")
+    for j in J_VALUES:
+        bl = b["reconstruction"]["dyadic"][str(j)]["rmse_mean"]
+        bz = b["reconstruction"]["zero_order_hold"][str(j)]["rmse_mean"]
+        nl = n["reconstruction"]["dyadic"][str(j)]["rmse_mean"]
+        nz = n["reconstruction"]["zero_order_hold"][str(j)]["rmse_mean"]
+        rs = "—" if nl <= 0 else f"{nz / nl:.2f}x"
+        A(f"| {j} | {bl:.4f} | {bz:.4f} | {nl:.4f} | {nz:.4f} | {rs} |")
+    A("")
+    A(f"j\\*(ZOH) = {b['j_star'].get('zero_order_hold')} ({base_label}) and "
+      f"{n['j_star'].get('zero_order_hold')} ({new_label}), vs j\\*(linear) = "
+      f"{b['j_star']['dyadic']} / {n['j_star']['dyadic']}.\n")
+    A(f"ZOH exec-match fractions: {base_label} `"
+      + ", ".join(f"{x:.4f}" for x in b.get("exec_match_fraction_zero_order_hold", []))
+      + f"`; {new_label} `"
+      + ", ".join(f"{x:.4f}" for x in n.get("exec_match_fraction_zero_order_hold", [])) + "`\n")
+
+    A(f"### `w_table` for {new_label} — paste under `zoomq:`\n")
+    A("```yaml")
+    A(nw["yaml_block"])
+    A("```\n")
+    A(f"Clamped UP to {nw['w_min']} (round, dim): {nw['clamped_to_min']}; "
+      f"clamped DOWN to {nw['w_max']}: {nw['clamped_to_max']}\n")
+
+    ext = nw.get("clamp_rate_external_w_table")
+    if ext:
+        loc = nw["clamp_rate_per_dim_w_table"]
+        wr = ext["width_ratio_external_over_local"]
+        A(f"### Would the {base_label} `w_table` have been fine on {new_label}?\n")
+        A(f"| round | clamp rate with {new_label}'s own table | clamp rate with the borrowed "
+          f"{base_label} table |")
+        A("|---|---|---|")
+        for r in sorted(loc["per_round"], key=int):
+            A(f"| {r} | {loc['per_round'][r]:.6f} | {ext['per_round'][r]:.6f} |")
+        A(f"| **pooled** | **{loc['pooled']:.6f}** | **{ext['pooled']:.6f}** |")
+        A("")
+        A(f"The borrowed table is {wr['mean']:.3f}x as wide on average "
+          f"(per-round means {[round(x, 3) for x in wr['per_round_mean']]}, "
+          f"range {wr['min']:.2f}-{wr['max']:.2f}x), so it clamps no more than the locally "
+          "fitted one.\n")
+    return "\n".join(L)
+
+
+def append_section(md_path: str, section: str) -> None:
+    """Append `section`, replacing an earlier copy of it if present."""
+    p = Path(md_path)
+    txt = p.read_text() if p.exists() else ""
+    i = txt.find(COMPARE_MARKER)
+    if i != -1:
+        txt = txt[:i]
+    p.write_text(txt.rstrip("\n") + "\n\n" + section.rstrip("\n") + "\n")
 
 
 def yaml_block(w_tab: np.ndarray) -> str:
@@ -419,12 +569,26 @@ def main(argv=None) -> int:
     p.add_argument("--exec-match-tol", type=float, default=0.05, help="zoomq exec_match_tol")
     p.add_argument("--target-rmse", type=float, default=0.05, help="threshold defining j*")
     p.add_argument("--window-scale", type=float, default=1.5, help="w_r = scale * p99(|e|)")
+    p.add_argument(
+        "--extra-w-table",
+        default=None,
+        help="another gate0 results JSON whose w_table is scored against THIS dataset",
+    )
     p.add_argument("--w-min", type=float, default=0.005, help="lower clamp on w_table entries")
     p.add_argument("--w-max", type=float, default=1.0, help="upper clamp on w_table entries")
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--out-json", default="/mnt/workspace/zoomq/gates/gate0_results.json")
     p.add_argument("--out-md", default="/mnt/workspace/zoomq/gates/gate0_report.md")
     p.add_argument("--self-test", action="store_true", help="run correctness checks and exit")
+    p.add_argument(
+        "--compare",
+        nargs=2,
+        metavar=("BASE_JSON", "NEW_JSON"),
+        default=None,
+        help="append a side-by-side section for two result files to --append-md, then exit",
+    )
+    p.add_argument("--compare-labels", nargs=2, default=("base", "new"))
+    p.add_argument("--append-md", default="/mnt/workspace/zoomq/gates/gate0_report.md")
     p.add_argument(
         "--zoomq-src",
         default=None,
@@ -434,6 +598,13 @@ def main(argv=None) -> int:
 
     if args.self_test:
         return self_test(args.zoomq_src, args.seed)
+
+    if args.compare:
+        base, new = args.compare
+        sec = compare_sections(base, new, args.compare_labels[0], args.compare_labels[1])
+        append_section(args.append_md, sec)
+        print(f"[gate0] appended '{COMPARE_MARKER}' to {args.append_md}")
+        return 0
 
     np.random.seed(args.seed)
     T = args.chunk_len
@@ -530,6 +701,22 @@ def main(argv=None) -> int:
     cr_scalar = clamp_report(clamp_scalar)
     cr_table = clamp_report(clamp_table)
 
+    # Cross-application: what would ANOTHER substrate's w_table do on this data?
+    cr_external = None
+    if args.extra_w_table:
+        ext = json.loads(Path(args.extra_w_table).read_text())["w_table_per_dim"]
+        w_ext = np.asarray(ext["w_table"], dtype=np.float64)
+        if w_ext.shape != w_tab.shape:
+            raise RuntimeError(f"external w_table {w_ext.shape} != {w_tab.shape}")
+        cr_external = clamp_report(ae > w_ext[sched["round_of_t"]].reshape(1, T, dim))
+        cr_external["source"] = args.extra_w_table
+        # how much wider/narrower is the borrowed table, on the non-root rounds?
+        ratio = w_ext[1:] / w_tab[1:]
+        cr_external["width_ratio_external_over_local"] = dict(
+            mean=float(ratio.mean()), min=float(ratio.min()), max=float(ratio.max()),
+            per_round_mean=[float(x) for x in ratio.mean(axis=1)],
+        )
+
     # per-round-0 note
     residuals["round_0"] = dict(
         knots=rounds[0],
@@ -539,7 +726,7 @@ def main(argv=None) -> int:
 
     # ---- (2) reconstruction: dyadic vs optimal DP ------------------------- #
     round_of_j = {len(sched["cum_knots"][r]): r for r in range(R)}
-    dyadic, optimal, per_chunk_rmse_dyadic = {}, {}, {}
+    dyadic, optimal, zoh, per_chunk_rmse_dyadic, per_chunk_rmse_zoh = {}, {}, {}, {}, {}
     recon_dyadic, recon_optimal = {}, {}
     for j in J_VALUES:
         r = round_of_j[j]
@@ -551,6 +738,14 @@ def main(argv=None) -> int:
         dyadic[str(j)] = st
         per_chunk_rmse_dyadic[j] = pc
         recon_dyadic[j] = rec
+
+        # zero-order hold on the same dyadic knots (Gate 1's alternative fill)
+        zrec = zoh_through(chunks, ks)
+        zst, zpc = err_stats(zrec, chunks)
+        zst["knots"] = ks
+        zst["round"] = r
+        zoh[str(j)] = zst
+        per_chunk_rmse_zoh[j] = zpc
 
         orec, oknots = optimal_knots(chunks, j)
         ost, _ = err_stats(orec, chunks)
@@ -581,6 +776,7 @@ def main(argv=None) -> int:
 
     j_star_dyadic = first_below(dyadic)
     j_star_optimal = first_below(optimal)
+    j_star_zoh = first_below(zoh)
 
     # ---- (3) smoothness --------------------------------------------------- #
     smooth = dict(demo=smooth_stats(chunks))
@@ -604,10 +800,11 @@ def main(argv=None) -> int:
         )
 
     # ---- (4) exec-match fractions ----------------------------------------- #
-    exec_frac = []
+    exec_frac, exec_frac_zoh = [], []
     for r in range(R):
         j = len(sched["cum_knots"][r])
         exec_frac.append(float((per_chunk_rmse_dyadic[j] <= args.exec_match_tol).mean()))
+        exec_frac_zoh.append(float((per_chunk_rmse_zoh[j] <= args.exec_match_tol).mean()))
 
     # Which chunks fail?  A binary dim that toggles inside the chunk cannot be
     # represented by any interpolation, so split the fractions on that event.
@@ -670,10 +867,12 @@ def main(argv=None) -> int:
         residuals_per_round_per_dim=per_round_per_dim,
         w_schedule=w_schedule,
         w_schedule_continuous_only=w_schedule_cont,
-        reconstruction=dict(dyadic=dyadic, optimal=optimal, non_dyadic_j=extra),
+        reconstruction=dict(dyadic=dyadic, optimal=optimal, zero_order_hold=zoh, non_dyadic_j=extra),
+        exec_match_fraction_zero_order_hold=exec_frac_zoh,
         j_star=dict(
             dyadic=j_star_dyadic,
             optimal=j_star_optimal,
+            zero_order_hold=j_star_zoh,
             criterion=f"smallest j in {list(J_VALUES)} with mean per-chunk RMSE <= {args.target_rmse}",
         ),
         smoothness=smooth,
@@ -699,6 +898,7 @@ def main(argv=None) -> int:
             dead_dims=dead_dims,
             clamp_rate_scalar_w_schedule=cr_scalar,
             clamp_rate_per_dim_w_table=cr_table,
+            clamp_rate_external_w_table=cr_external,
             scalar_w_schedule_used=w_schedule,
             exec_match_fraction_unchanged=True,
             exec_match_fraction_note=(
@@ -714,8 +914,9 @@ def main(argv=None) -> int:
         json.dump(results, f, indent=2)
     print(f"[gate0] wrote {args.out_json}")
 
-    write_report(args.out_md, results, args)
-    print(f"[gate0] wrote {args.out_md}")
+    if args.out_md:
+        write_report(args.out_md, results, args)
+        print(f"[gate0] wrote {args.out_md}")
     return 0
 
 
@@ -784,7 +985,23 @@ def write_report(path: str, res: dict, args) -> None:
           f"{o['maxabs_mean']:.4f} / {o['maxabs_max']:.4f} |")
     A("")
     A(f"- **j\\* (dyadic, mean RMSE <= {args.target_rmse}) = {res['j_star']['dyadic']}**")
-    A(f"- **j\\* (optimal DP, mean RMSE <= {args.target_rmse}) = {res['j_star']['optimal']}**\n")
+    A(f"- **j\\* (optimal DP, mean RMSE <= {args.target_rmse}) = {res['j_star']['optimal']}**")
+    A(f"- j\\* (dyadic + zero-order hold) = {res['j_star'].get('zero_order_hold')}\n")
+
+    if "zero_order_hold" in res["reconstruction"]:
+        A("Linear interpolation vs zero-order hold on the SAME dyadic knots:\n")
+        A("| j | linear RMSE mean | ZOH RMSE mean | ZOH / linear | linear max-abs mean | ZOH max-abs mean |")
+        A("|---|---|---|---|---|---|")
+        for j in J_VALUES:
+            li = res["reconstruction"]["dyadic"][str(j)]
+            zo = res["reconstruction"]["zero_order_hold"][str(j)]
+            ratio = zo["rmse_mean"] / li["rmse_mean"] if li["rmse_mean"] > 0 else float("nan")
+            rs = "—" if not np.isfinite(ratio) else f"{ratio:.2f}x"
+            A(f"| {j} | {li['rmse_mean']:.4f} | {zo['rmse_mean']:.4f} | {rs} | "
+              f"{li['maxabs_mean']:.4f} | {zo['maxabs_mean']:.4f} |")
+        A("")
+        A("ZOH exec-match fractions = `["
+          + ", ".join(f"{f:.4f}" for f in res["exec_match_fraction_zero_order_hold"]) + "]`\n")
 
     if res["reconstruction"].get("non_dyadic_j"):
         A("Off-schedule budgets (the dyadic schedule has no such round; measured only "

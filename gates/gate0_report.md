@@ -65,6 +65,19 @@ Continuous-dims-only `w_schedule` = `[1.0000, 0.3887, 0.1353, 0.0568, 0.0398]`
 
 - **j\* (dyadic, mean RMSE <= 0.05) = 3**
 - **j\* (optimal DP, mean RMSE <= 0.05) = 3**
+- j\* (dyadic + zero-order hold) = 5
+
+Linear interpolation vs zero-order hold on the SAME dyadic knots:
+
+| j | linear RMSE mean | ZOH RMSE mean | ZOH / linear | linear max-abs mean | ZOH max-abs mean |
+|---|---|---|---|---|---|
+| 2 | 0.0610 | 0.1500 | 2.46x | 0.3224 | 0.6788 |
+| 3 | 0.0303 | 0.0845 | 2.79x | 0.2382 | 0.5084 |
+| 5 | 0.0176 | 0.0438 | 2.49x | 0.1912 | 0.3353 |
+| 9 | 0.0106 | 0.0190 | 1.78x | 0.1416 | 0.1818 |
+| 16 | 0.0000 | 0.0000 | — | 0.0000 | 0.0000 |
+
+ZOH exec-match fractions = `[0.1734, 0.3436, 0.7554, 0.9411, 1.0000]`
 
 Off-schedule budgets (the dyadic schedule has no such round; measured only to compare against the proposal's four-knot figure):
 
@@ -182,3 +195,94 @@ Scalar `w_schedule` = `[1.0, 0.5794, 0.1624, 0.0596, 0.0395]`
 ## 6. Verdict
 
 Measured on real demonstrations, the residual windows the dyadic codec actually needs are `[1.0000, 0.5794, 0.1624, 0.0596, 0.0395]` for rounds 0-4, i.e. 3.86x, 2.03x, 1.49x, 1.97x the proposal's illustrative w = (0.15, 0.08, 0.04, 0.02) for rounds 1-4. Dropping the binary/dead dims [13, 14] gives `[1.0000, 0.3887, 0.1353, 0.0568, 0.0398]` (2.59x, 1.69x, 1.42x, 1.99x the proposal), so the discrepancy at the coarse rounds is driven by the binary gripper dimension, which no interpolation window can shrink. Reconstruction error falls from 0.0610 (j=2) to 0.0303 (j=3), 0.0176 (j=5) and 0.0106 (j=9) under the fixed dyadic schedule; the optimal DP placement reaches 0.0219 / 0.0048 / 0.0020 at the same budgets, so the cost of the fixed schedule is +0.0129 RMSE at j=5. j* = 3 (dyadic) and 3 (optimal DP) at the 0.05 threshold, against the proposal's claim of RMSE 0.0252 at four knots (j*=4); the dyadic schedule has no 4-knot member, and its nearest budgets bracket that claim at 0.0303 (j=3) and 0.0176 (j=5). At exactly four knots the fixed uniform set [0, 5, 10, 15] gives 0.0215 and the optimal DP placement gives 0.0074, versus the proposal's 0.0252. The exec-match predicate at tol=0.05 admits 0.627, 0.864, 0.873, 0.882, 1.000 of demo chunks at rounds 0-4, which is what the `exec_n_r` counters should log.
+
+## 7. Substrate comparison: HOMIE-era vs floating-era
+
+- `HOMIE-era` = `/mnt/workspace/zoomq/runs/A/demo_buffer` (7709 chunks, D=15)
+- `floating-era` = `/mnt/workspace/zoomq/runs/I/demo_buffer` (7709 chunks, D=15)
+
+### Which action dims actually changed between the two substrates
+
+Episode-matched max |difference| per dim: `[1.0329, 0.8368, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]`
+
+**Only dims [0, 1] differ; dims [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14] are bit-identical.**
+
+### Scalar per-round window `w_r = 1.5 * p99(|e|)`
+
+| round | HOMIE-era | floating-era | ratio |
+|---|---|---|---|
+| 0 | 1.0000 | 1.0000 | 1.00x |
+| 1 | 0.5794 | 0.4601 | 0.79x |
+| 2 | 0.1624 | 0.1280 | 0.79x |
+| 3 | 0.0596 | 0.0524 | 0.88x |
+| 4 | 0.0395 | 0.0361 | 0.91x |
+
+### Reconstruction and j*
+
+| j | HOMIE-era dyadic | floating-era dyadic | HOMIE-era optimal | floating-era optimal |
+|---|---|---|---|---|
+| 2 | 0.0610 | 0.0574 | 0.0610 | 0.0574 |
+| 3 | 0.0303 | 0.0290 | 0.0219 | 0.0208 |
+| 5 | 0.0176 | 0.0172 | 0.0048 | 0.0045 |
+| 9 | 0.0106 | 0.0104 | 0.0020 | 0.0019 |
+| 16 | 0.0000 | 0.0000 | 0.0000 | 0.0000 |
+| **j\*** | **3** / 3 | **3** / 3 | (dyadic / optimal) | |
+
+### Predicted `exec_n_r`
+
+| round | HOMIE-era | floating-era | delta |
+|---|---|---|---|
+| 0 | 0.6273 | 0.6853 | +0.0580 |
+| 1 | 0.8638 | 0.8654 | +0.0016 |
+| 2 | 0.8734 | 0.8734 | +0.0000 |
+| 3 | 0.8817 | 0.8817 | +0.0000 |
+| 4 | 1.0000 | 1.0000 | +0.0000 |
+
+### Dimension classification
+
+| substrate | binary dims | dead dims | continuous dims |
+|---|---|---|---|
+| HOMIE-era | [13] | [14] | 13 |
+| floating-era | [13] | [14] | 13 |
+
+### Linear interpolation vs zero-order hold
+
+| j | HOMIE-era linear | HOMIE-era ZOH | floating-era linear | floating-era ZOH | ZOH/linear |
+|---|---|---|---|---|---|
+| 2 | 0.0610 | 0.1500 | 0.0574 | 0.1415 | 2.47x |
+| 3 | 0.0303 | 0.0845 | 0.0290 | 0.0797 | 2.74x |
+| 5 | 0.0176 | 0.0438 | 0.0172 | 0.0415 | 2.42x |
+| 9 | 0.0106 | 0.0190 | 0.0104 | 0.0181 | 1.74x |
+| 16 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | — |
+
+j\*(ZOH) = 5 (HOMIE-era) and 5 (floating-era), vs j\*(linear) = 3 / 3.
+
+ZOH exec-match fractions: HOMIE-era `0.1734, 0.3436, 0.7554, 0.9411, 1.0000`; floating-era `0.1784, 0.3659, 0.8237, 0.9412, 1.0000`
+
+### `w_table` for floating-era — paste under `zoomq:`
+
+```yaml
+  # Gate 0 per-(round, dim) residual windows: w[r][d] = 1.5 * p99(|a[t] - p_t|),
+  # clamped into [0.005, 1.0]. Row r = round r, column d = action dim d.
+  w_schedule:
+    - [1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000]  # round 0
+    - [0.2802, 0.4233, 0.2680, 0.1868, 0.3191, 0.4030, 0.3183, 0.3673, 0.1423, 0.3198, 0.2764, 0.2009, 0.2909, 1.0000, 0.0050]  # round 1
+    - [0.0925, 0.1341, 0.1039, 0.0637, 0.1007, 0.1247, 0.1037, 0.2280, 0.0431, 0.1013, 0.0838, 0.0637, 0.1337, 1.0000, 0.0050]  # round 2
+    - [0.0323, 0.0437, 0.0368, 0.0229, 0.0371, 0.0461, 0.0344, 0.1417, 0.0162, 0.0327, 0.0278, 0.0219, 0.0681, 1.0000, 0.0050]  # round 3
+    - [0.0299, 0.0476, 0.0239, 0.0202, 0.0343, 0.0426, 0.0262, 0.0820, 0.0131, 0.0321, 0.0274, 0.0159, 0.0403, 1.0000, 0.0050]  # round 4
+```
+
+Clamped UP to 0.005 (round, dim): [[1, 14], [2, 14], [3, 14], [4, 14]]; clamped DOWN to 1.0: [[1, 13], [2, 13], [3, 13], [4, 13]]
+
+### Would the HOMIE-era `w_table` have been fine on floating-era?
+
+| round | clamp rate with floating-era's own table | clamp rate with the borrowed HOMIE-era table |
+|---|---|---|
+| 0 | 0.000000 | 0.000000 |
+| 1 | 0.004730 | 0.004627 |
+| 2 | 0.002871 | 0.002694 |
+| 3 | 0.002990 | 0.002761 |
+| 4 | 0.002029 | 0.001951 |
+| **pooled** | **0.002290** | **0.002170** |
+
+The borrowed table is 1.066x as wide on average (per-round means [1.033, 1.076, 1.108, 1.046], range 1.00-2.53x), so it clamps no more than the locally fitted one.
