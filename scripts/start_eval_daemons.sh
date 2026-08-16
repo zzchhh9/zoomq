@@ -55,10 +55,12 @@ done
 # much longer Phase 2 episodes.
 setsid nohup "$EVAL_PYTHON" scripts/eval_daemon.py \
   --gpu 0 --jobs 8 --episodes 25 --videos 0 --oldest-first \
+  --train-script train_cqn_as_bigym.py \
   "${p1_paths[@]}" > "$LOGS/evald_p1.log" 2>&1 < /dev/null &
 
 setsid nohup "$EVAL_PYTHON" scripts/eval_daemon.py \
   --gpu 1 --jobs 16 --episodes 25 --videos 0 --oldest-first \
+  --train-script train_cqn_as_bigym.py \
   "${p2_paths[@]}" > "$LOGS/evald_p2.log" 2>&1 < /dev/null &
 
 sleep 3
