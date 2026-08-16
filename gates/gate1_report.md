@@ -169,7 +169,7 @@ and **1.0e-4 m** worst case over 426 restores. The channel-wise probe
 | era | chunks | max abs qpos residual | max abs qvel residual | max hand residual (m) | chunks exactly 0 |
 |---|---|---|---|---|---|
 | `floating` | 170 | 5.0e-4 | 0.156 | **3.4e-5** | 19.4 % |
-| `homie` | 117 | 1.5e-2 | 1.77 | **5.7e-5** | 18.8 % |
+| `homie` | 95 | 1.5e-2 | 1.77 | **5.7e-5** | 20.0 % |
 
 **The restore is not bit-exact on this scene.** The GOLDEN record in
 `tests/smoke/snapshot_roundtrip_probe.py` (`max|A-B| = 0.000e+00`) was measured
