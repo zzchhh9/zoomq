@@ -49,6 +49,16 @@ set +eu
 source /usr/local/PPU_SDK/envsetup.sh >/dev/null 2>&1
 set -eu
 
+# DEMO_HOME redirects bigym's demonstration cache. `bigym.const` hardcodes
+# CACHE_PATH = Path.home()/".bigym" with no env override, so HOME is the only
+# lever -- but python's user site-packages (/root/.local, where mujoco lives)
+# is derived from HOME too, so PYTHONUSERBASE has to be pinned alongside it or
+# the import breaks. Verified: mujoco 3.11.0 and torch 2.6.0 still import.
+if [ -n "${DEMO_HOME:-}" ]; then
+  export HOME="${DEMO_HOME}"
+  export PYTHONUSERBASE="${PYTHONUSERBASE:-/root/.local}"
+fi
+
 export MUJOCO_GL=egl
 export OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 NUMEXPR_NUM_THREADS=4
 export CUDA_VISIBLE_DEVICES="${PPU}"
