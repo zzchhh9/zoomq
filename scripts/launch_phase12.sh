@@ -22,11 +22,12 @@
 #   CQN-AS's own ablation reports temporal ensembling HELPS on most tasks, so
 #   using it as "the baseline" handicaps the reference.
 #
-# episode_length — the repo's task yamls carry BiGym-2-era budgets that are
-#   2.0-2.5x the paper's for five of these tasks (they were raised for native
-#   HOMIE demos collected at episode_length=15000). Pinned back to the paper's
-#   lengths x demo_down_sample_rate=10. Move Plate and Reach Target Single
-#   already match and are left alone.
+# episode_length — LEFT AT THE TASK YAML. main.tex Table 1's "length" column is
+#   NOT the episode budget: measured demo lengths at dsr=10 are Take Cups 881,
+#   Put Cups 756, Dishwasher Unload Cutlery 1382, Flip Cutlery 657, Saucepan To
+#   Hob 1047 outer steps, all LONGER than that column (420/425/620/500/440) and
+#   all comfortably under the repo yaml (1050/850/1550/1250/1100). Overriding to
+#   the paper's numbers would truncate every demonstration.
 #
 # DEMO_HOME — the public release carries 40 tasks; ali's shared cache had only
 #   11 extracted, and under a 3-floating-DOF directory name while the code
@@ -46,12 +47,12 @@ ZQ_FIX="zoomq.exec_match_mode=online_minimal zoomq.exec_loss_norm=per_depth"
 ppu=0
 next_ppu() { ppu=$(( (ppu + 1) % 16 )); }
 
-# arm <name> <config|-> <task> <episode_length> <seed> <eval_every> <extra...>
+# arm <name> <config|-> <task> <seed> <eval_every> <extra...>
 arm() {
-  local name="$1" cfg="$2" task="$3" eplen="$4" seed="$5" ev="$6"; shift 6
+  local name="$1" cfg="$2" task="$3" seed="$4" ev="$5"; shift 5
   $DRY env DEMO_HOME="$DEMO_HOME" SEED="$seed" EVAL_EVERY="$ev" EVAL_EPS=25 \
     setsid nohup $L "$name" "$ppu" "$cfg" \
-      bigym_task="$task" episode_length="$eplen" $FLOAT "$@" \
+      bigym_task="$task" $FLOAT "$@" \
       > "logs/${name}.log" 2>&1 < /dev/null &
   next_ppu
   sleep 2
@@ -64,8 +65,8 @@ arm() {
 #   Move Plate       CQN-AS 64.0 +- 7.5
 #   Saucepan To Hob  CQN-AS 80.5 +- 13.3
 for s in 1 2 3; do
-  arm "p1_mp_s${s}"  - move_plate      3000 "$s" 5000
-  arm "p1_sh_s${s}"  - saucepan_to_hob 4400 "$s" 10000
+  arm "p1_mp_s${s}"  - move_plate      "$s" 5000
+  arm "p1_sh_s${s}"  - saucepan_to_hob "$s" 10000
 done
 
 # ---------------------------------------------------------------- Phase 2 ----
@@ -81,11 +82,11 @@ done
 #          "ZoomQ with the depth decision disabled".
 #   zqF  — ZoomQ with the execution-head attribution fix.
 for s in 1 2; do
-  for spec in "tc:take_cups:4200" "pc:put_cups:4250" "du:dishwasher_unload_cutlery:6200" "fc:flip_cutlery:5000"; do
-    short="${spec%%:*}"; rest="${spec#*:}"; task="${rest%%:*}"; eplen="${rest##*:}"
-    arm "p2_${short}_base_s${s}" -                    "$task" "$eplen" "$s" 10000
-    arm "p2_${short}_zqA_s${s}"  config_zoomq_bigym   "$task" "$eplen" "$s" 10000
-    arm "p2_${short}_zqF_s${s}"  config_zoomq_bigym   "$task" "$eplen" "$s" 10000 $ZQ_FIX
+  for spec in "tc:take_cups" "pc:put_cups" "du:dishwasher_unload_cutlery" "fc:flip_cutlery"; do
+    short="${spec%%:*}"; task="${spec#*:}"
+    arm "p2_${short}_base_s${s}" -                    "$task" "$s" 10000
+    arm "p2_${short}_zqA_s${s}"  config_zoomq_bigym   "$task" "$s" 10000
+    arm "p2_${short}_zqF_s${s}"  config_zoomq_bigym   "$task" "$s" 10000 $ZQ_FIX
   done
 done
 
