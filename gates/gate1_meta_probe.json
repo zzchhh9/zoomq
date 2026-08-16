@@ -1,0 +1,293 @@
+{
+  "constants": {
+    "CONTROL_FREQUENCY_MAX": 500,
+    "CONTROL_FREQUENCY_MIN": 20,
+    "PHYSICS_DT_nominal": 0.002
+  },
+  "versions": {
+    "mujoco": "3.11.0"
+  },
+  "move_plate": {
+    "dsr5": {
+      "compiled_timestep_s": 0.002,
+      "nominal_PHYSICS_DT_s": 0.002,
+      "control_frequency_hz": 100,
+      "sub_steps_count": 5,
+      "control_step_seconds": 0.01,
+      "effective_hz": 100.0,
+      "success_hold_steps_at_1s": 100,
+      "model_path": "/mnt/data/bigym/bigym/envs/xmls/world.xml",
+      "max_outer_steps": 600,
+      "nq": 37,
+      "nv": 36,
+      "nu": 15,
+      "solver": 2,
+      "integrator": 3
+    },
+    "dsr10": {
+      "compiled_timestep_s": 0.002,
+      "nominal_PHYSICS_DT_s": 0.002,
+      "control_frequency_hz": 50,
+      "sub_steps_count": 10,
+      "control_step_seconds": 0.02,
+      "effective_hz": 50.0,
+      "success_hold_steps_at_1s": 50,
+      "model_path": "/mnt/data/bigym/bigym/envs/xmls/world.xml",
+      "max_outer_steps": 300,
+      "nq": 37,
+      "nv": 36,
+      "nu": 15,
+      "solver": 2,
+      "integrator": 3
+    },
+    "metadata_repr": "Metadata(observation_mode=<ObservationMode.State: 'state'>, environment_data=EnvData(env_name='MovePlate', action_mode_name='JointPositionActionMode', floating_base=True, observation_config=ObservationConfig(cameras=[], proprioception=True, privileged_information=False), action_mode_absolute=True, floating_dofs=['pelvis_x', 'pelvis_y', 'pelvis_rz'], reset_positions=[], robot_name='H1'), seed=0, package_versions={}, date='2026-08-16_11-34-13', uuid='ae618abff8424625a9687f42770423e9')",
+    "light_demo_files_n": 1,
+    "n_demos": 60,
+    "demo_metadata_fields": [
+      "date",
+      "environment_data",
+      "observation_mode",
+      "package_versions",
+      "seed",
+      "uuid"
+    ],
+    "demo0": {
+      "uuid": "102f0940a27f40409e0c8fd901283e41",
+      "seed": 687812838,
+      "date": "2026-03-25_08-20-53",
+      "package_versions": {
+        "mujoco": "3.1.5",
+        "bigym": "4.1.0"
+      },
+      "observation_mode": "ObservationMode.State",
+      "n_timesteps": 178,
+      "env_data": {
+        "env_name": "MovePlate",
+        "action_mode_name": "JointPositionActionMode",
+        "floating_base": "True",
+        "observation_config": "ObservationConfig(cameras=[], proprioception=True, privileged_information=False)",
+        "action_mode_absolute": "True",
+        "floating_dofs": "['pelvis_x', 'pelvis_y', 'pelvis_rz']",
+        "reset_positions": "[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]",
+        "robot_name": "H1"
+      }
+    },
+    "demo_step_fields": [
+      "info",
+      "observation",
+      "reward",
+      "termination",
+      "truncation"
+    ],
+    "demo_step1_info_keys": [
+      "demo_action",
+      "task_success"
+    ],
+    "rate_field_hits": [],
+    "package_versions_histogram": {
+      "{\"bigym\": \"4.1.0\", \"mujoco\": \"3.1.5\"}": 60
+    },
+    "dates": [
+      "2026-03-25_08-20-40",
+      "2026-03-25_08-20-41",
+      "2026-03-25_08-20-42",
+      "2026-03-25_08-20-43",
+      "2026-03-25_08-20-44",
+      "2026-03-25_08-20-45",
+      "2026-03-25_08-20-46",
+      "2026-03-25_08-20-47",
+      "2026-03-25_08-20-48",
+      "2026-03-25_08-20-49",
+      "2026-03-25_08-20-50",
+      "2026-03-25_08-20-51",
+      "2026-03-25_08-20-52",
+      "2026-03-25_08-20-53",
+      "2026-03-25_08-20-54",
+      "2026-03-25_08-20-55",
+      "2026-03-25_08-20-56",
+      "2026-03-25_08-20-57",
+      "2026-03-25_08-20-58",
+      "2026-03-25_08-20-59",
+      "2026-03-25_08-21-00",
+      "2026-03-25_08-21-01"
+    ],
+    "n_unique_seeds": 60,
+    "n_unique_uuids": 60,
+    "timesteps_len_at_50hz": {
+      "min": 133,
+      "max": 334,
+      "mean": 183.11666666666667
+    },
+    "order_same_np_seed_0_vs_0": true,
+    "order_np_seed_0_vs_1": false,
+    "order_seed0_head": [
+      "b737fd563575402b804026262f68da7d",
+      "647dd7dabc2f44498dc5112bab5bdf19",
+      "36ca6107b88d4095bb37f4e26bd9daa5",
+      "d3d47ca2cfed4518adc50b6a5401e37b",
+      "53ceed3b18db4b40a85fc9a467d99c82"
+    ],
+    "order_seed1_head": [
+      "dabdcf9518ac45cf80a1ad0c21757d8f",
+      "e8071cb69d8a49d5b5f697ba2334e830",
+      "c17367c7550d4b1e9f1b72f91354a9a2",
+      "1cdd529b28614f5c80e1f230b611c05c",
+      "cceb3240f6eb44719bb91b77f79ff26f"
+    ],
+    "order_is_sorted_by_uuid": false,
+    "dsr25": {
+      "compiled_timestep_s": 0.002,
+      "nominal_PHYSICS_DT_s": 0.002,
+      "control_frequency_hz": 20,
+      "sub_steps_count": 25,
+      "control_step_seconds": 0.05,
+      "effective_hz": 20.0,
+      "success_hold_steps_at_1s": 20,
+      "model_path": "/mnt/data/bigym/bigym/envs/xmls/world.xml",
+      "max_outer_steps": 120,
+      "nq": 37,
+      "nv": 36,
+      "nu": 15,
+      "solver": 2,
+      "integrator": 3
+    }
+  },
+  "drawer_top_close": {
+    "dsr5": {
+      "compiled_timestep_s": 0.002,
+      "nominal_PHYSICS_DT_s": 0.002,
+      "control_frequency_hz": 100,
+      "sub_steps_count": 5,
+      "control_step_seconds": 0.01,
+      "effective_hz": 100.0,
+      "success_hold_steps_at_1s": 100,
+      "model_path": "/mnt/data/bigym/bigym/envs/xmls/world.xml",
+      "max_outer_steps": 600,
+      "nq": 38,
+      "nv": 38,
+      "nu": 16,
+      "solver": 2,
+      "integrator": 3
+    },
+    "dsr10": {
+      "compiled_timestep_s": 0.002,
+      "nominal_PHYSICS_DT_s": 0.002,
+      "control_frequency_hz": 50,
+      "sub_steps_count": 10,
+      "control_step_seconds": 0.02,
+      "effective_hz": 50.0,
+      "success_hold_steps_at_1s": 50,
+      "model_path": "/mnt/data/bigym/bigym/envs/xmls/world.xml",
+      "max_outer_steps": 300,
+      "nq": 38,
+      "nv": 38,
+      "nu": 16,
+      "solver": 2,
+      "integrator": 3
+    },
+    "metadata_repr": "Metadata(observation_mode=<ObservationMode.State: 'state'>, environment_data=EnvData(env_name='DrawerTopClose', action_mode_name='JointPositionActionMode', floating_base=True, observation_config=ObservationConfig(cameras=[], proprioception=True, privileged_information=False), action_mode_absolute=True, floating_dofs=['pelvis_x', 'pelvis_y', 'pelvis_z', 'pelvis_rz'], reset_positions=[], robot_name='H1'), seed=0, package_versions={}, date='2026-08-16_11-34-30', uuid='e730ed917cf748d39d05a3dd4c544b33')",
+    "light_demo_files_n": 1,
+    "n_demos": 51,
+    "demo_metadata_fields": [
+      "date",
+      "environment_data",
+      "observation_mode",
+      "package_versions",
+      "seed",
+      "uuid"
+    ],
+    "demo0": {
+      "uuid": "91706a8b3cf7430c9de8980e5a569b73",
+      "seed": 3814230101,
+      "date": "2026-04-15_17-37-05",
+      "package_versions": {
+        "mujoco": "3.1.5",
+        "bigym": "4.1.0"
+      },
+      "observation_mode": "ObservationMode.State",
+      "n_timesteps": 160,
+      "env_data": {
+        "env_name": "DrawerTopClose",
+        "action_mode_name": "JointPositionActionMode",
+        "floating_base": "True",
+        "observation_config": "ObservationConfig(cameras=[], proprioception=True, privileged_information=False)",
+        "action_mode_absolute": "True",
+        "floating_dofs": "['pelvis_x', 'pelvis_y', 'pelvis_z', 'pelvis_rz']",
+        "reset_positions": "[-0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]",
+        "robot_name": "H1"
+      }
+    },
+    "demo_step_fields": [
+      "info",
+      "observation",
+      "reward",
+      "termination",
+      "truncation"
+    ],
+    "demo_step1_info_keys": [
+      "demo_action",
+      "task_success"
+    ],
+    "rate_field_hits": [],
+    "package_versions_histogram": {
+      "{\"bigym\": \"4.1.0\", \"mujoco\": \"3.1.5\"}": 51
+    },
+    "dates": [
+      "2026-04-15_17-36-58",
+      "2026-04-15_17-36-59",
+      "2026-04-15_17-37-00",
+      "2026-04-15_17-37-01",
+      "2026-04-15_17-37-02",
+      "2026-04-15_17-37-03",
+      "2026-04-15_17-37-04",
+      "2026-04-15_17-37-05",
+      "2026-04-15_17-37-06",
+      "2026-04-15_17-37-07",
+      "2026-04-15_17-37-08",
+      "2026-04-15_17-37-09",
+      "2026-04-15_17-37-10",
+      "2026-04-15_17-37-11",
+      "2026-04-15_17-37-12"
+    ],
+    "n_unique_seeds": 51,
+    "n_unique_uuids": 51,
+    "timesteps_len_at_50hz": {
+      "min": 155,
+      "max": 200,
+      "mean": 167.4313725490196
+    },
+    "order_same_np_seed_0_vs_0": true,
+    "order_np_seed_0_vs_1": false,
+    "order_seed0_head": [
+      "ef4ae065446049b38e841360bb17d9f4",
+      "f913c1a124f9452a971ba95c09799831",
+      "8bb3c0a2cc484d88888ab708418f7e93",
+      "c883187dd2494484a7231042f5f9a353",
+      "3ab518905fc94ba7b306c8c5f38fb6f3"
+    ],
+    "order_seed1_head": [
+      "c883187dd2494484a7231042f5f9a353",
+      "3ab518905fc94ba7b306c8c5f38fb6f3",
+      "24fd1fa972ce46d8843a913e902369a1",
+      "b323e9935cd849ab81616ebca95528fe",
+      "44bb7fa9547b46e3ab35b76ddc34d3c3"
+    ],
+    "order_is_sorted_by_uuid": false,
+    "dsr25": {
+      "compiled_timestep_s": 0.002,
+      "nominal_PHYSICS_DT_s": 0.002,
+      "control_frequency_hz": 20,
+      "sub_steps_count": 25,
+      "control_step_seconds": 0.05,
+      "effective_hz": 20.0,
+      "success_hold_steps_at_1s": 20,
+      "model_path": "/mnt/data/bigym/bigym/envs/xmls/world.xml",
+      "max_outer_steps": 120,
+      "nq": 38,
+      "nv": 38,
+      "nu": 16,
+      "solver": 2,
+      "integrator": 3
+    }
+  }
+}

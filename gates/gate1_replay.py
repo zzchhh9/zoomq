@@ -83,6 +83,17 @@ import numpy as np  # noqa: E402
 CHUNK_LEN = 16
 J_VALUES = (2, 3, 5, 9, 16)
 
+# Per-task env facts, copied from cfgs/bigym_task/<task>.yaml of the repo
+# (the trainer reads exactly these).  ``enable_all_floating_dof`` changes the
+# floating-DOF set and therefore the demo directory ('..._pelvis_z_...'), so
+# it MUST match the yaml or DemoStore returns a different demo family.
+TASK_CONFIG = {
+    "move_plate":       {"enable_all_floating_dof": False,
+                         "episode_length": 3000, "n_demos": 60},
+    "drawer_top_close": {"enable_all_floating_dof": True,
+                         "episode_length": 3000, "n_demos": 51},
+}
+
 # CQN-AS quantisation actually used by the live runs (.hydra/config.yaml:
 # levels: 3, bins: 5 over the normalised [-1, 1] action range).
 FINE_BIN_QUANTUM = 2.0 / (5 ** 3)          # 0.016
@@ -205,19 +216,28 @@ ERA_VARIANTS = {
 }
 
 
-def build_env(era: str, hold: float, overrides: dict | None = None):
+def build_env(era: str, hold: float, overrides: dict | None = None,
+              task: str = "move_plate", dsr: int = 10):
+    """Build the replay env.
+
+    ``dsr`` (``demo_down_sample_rate``) is the ONLY rate knob: bigym derives
+    the env control frequency from it as ``CONTROL_FREQUENCY_MAX // dsr``
+    (bigym/loco/env.py) and DemoStore decimates the 500 Hz source demos to
+    the same frequency, so demo rate and control rate cannot diverge.
+    """
     import bigym_src.bigym_env as bigym_env
 
+    tc = TASK_CONFIG[task]
     policy, _ = ERAS[era]
     pol = dict(policy)
     pol.update(overrides or {})
     return bigym_env.make(
-        task_name="move_plate",
-        enable_all_floating_dof=False,
+        task_name=task,
+        enable_all_floating_dof=tc["enable_all_floating_dof"],
         control_pelvis=True,
         action_mode="absolute",
-        demo_down_sample_rate=10,
-        episode_length=3000,
+        demo_down_sample_rate=int(dsr),
+        episode_length=tc["episode_length"],
         frame_stack=1,
         camera_shape=(84, 84),
         camera_keys=(),           # State demos; no pixels needed for replay
@@ -245,7 +265,8 @@ def _trim(steps):
     return out
 
 
-def load_demos(env, untrimmed: bool = True):
+def load_demos(env, untrimmed: bool = True, cache_root: str | None = None,
+               order: str = "seed", keep_first: bool = False):
     """Load the stock DemoStore demos through the repo's own conversion path.
 
     Returns a list of dicts with the demo's reset seed and its actions already
@@ -254,14 +275,30 @@ def load_demos(env, untrimmed: bool = True):
     so the normalisation matches a training run bit for bit.
     """
     from demonstrations.demo_store import DemoStore
+    from bigym.bigym_env import CONTROL_FREQUENCY_MAX
 
     inner = env._env
-    raw = DemoStore().get_demos(inner._demo_metadata(), amount=-1, frequency=50)
+    dsr = int(inner._demo_down_sample_rate)
+    # bigym/loco/env.py BiGym.get_demos uses exactly this frequency.
+    freq = CONTROL_FREQUENCY_MAX // dsr
+    store = DemoStore(Path(cache_root)) if cache_root else DemoStore()
+    raw = store.get_demos(inner._demo_metadata(), amount=-1, frequency=freq)
     for d in raw:
         for ts in d.timesteps:
             ts.observation = {k: np.array(v, dtype=np.float32)
                               for k, v in ts.observation.items()}
-    raw.sort(key=lambda d: int(d.seed))       # DemoStore returns them shuffled
+    # DemoStore._get_demos() ends in np.random.shuffle(files): the order it
+    # returns depends on the GLOBAL numpy RNG state, so a positional index
+    # into that list is NOT a stable demo key.  The stable keys are the demo
+    # uuid (== its .safetensors filename) and its recorded reset seed; both
+    # are unique per task.  Rank in either total order is deterministic.
+    uuid_rank = {u: i for i, u in
+                 enumerate(sorted(d.metadata.uuid for d in raw))}
+    seed_rank = {s: i for i, s in enumerate(sorted(int(d.seed) for d in raw))}
+    if order == "uuid":
+        raw.sort(key=lambda d: d.metadata.uuid)
+    else:
+        raw.sort(key=lambda d: int(d.seed))
 
     # training-identical action stats
     converted = [inner.convert_demo_to_timesteps(_trim(d.timesteps))[0] for d in raw]
@@ -280,13 +317,26 @@ def load_demos(env, untrimmed: bool = True):
             acts.append(a)
         acts = inner._convert_action_from_raw(np.stack(acts))
         clipped = float(np.mean((acts < -1) | (acts > 1)))
-        # index 0 is the reset step's dummy action (DemoStep.action is "the
-        # action taken to REACH the timestep"), so the executable sequence is [1:]
+        # DemoStep.action is "the action taken to REACH the timestep".  The
+        # historical Gate-1 default treats index 0 as the reset step's dummy
+        # action and executes [1:].  That is WRONG for the cached DemoStore
+        # demos: DemoConverter.create_demo_in_new_env resets and then steps
+        # with EVERY source action, so its timestep 0 is already a
+        # post-action state and carries a real executed action.  Dropping it
+        # replays a trajectory one action short (measured cost on move_plate
+        # at 50 Hz: 0.867 -> 0.750).  keep_first=True executes all of them.
         out.append({
             "seed": int(d.seed),
-            "actions": np.clip(acts[1:], -1, 1).astype(np.float32),
+            "uuid": str(d.metadata.uuid),
+            "index": int(uuid_rank[d.metadata.uuid]),
+            "seed_rank": int(seed_rank[int(d.seed)]),
+            "actions": np.clip(acts if keep_first else acts[1:],
+                               -1, 1).astype(np.float32),
             "clipped_frac": clipped,
             "demo_reward": float(sum(s.reward for s in steps)),
+            "demo_steps": int(len(steps) if keep_first else len(steps) - 1),
+            "demo_first_reward_step": next(
+                (i for i, s in enumerate(steps) if s.reward > 0), -1),
         })
     return out
 
@@ -313,8 +363,11 @@ def rollout(env, actions, seed, record=False):
     inner = env._env
     env.reset(seed=int(seed))
     rew, steps, hands, joints = 0.0, 0, [], []
+    first_rew = -1
     for a in actions:
         ts = env.step(np.asarray(a, dtype=np.float32))
+        if first_rew < 0 and float(ts.reward) > 0:
+            first_rew = steps
         rew += float(ts.reward)
         steps += 1
         if record:
@@ -323,6 +376,7 @@ def rollout(env, actions, seed, record=False):
         if ts.last():
             break
     res = {"seed": int(seed), "steps": steps, "reward": rew,
+           "first_reward_step": int(first_rew),
            "success": int(rew >= 0.25)}
     if record:
         res["hands"] = np.stack(hands)
@@ -370,7 +424,16 @@ def restore(inner, snap: dict) -> None:
 # modes
 # --------------------------------------------------------------------------- #
 def mode_raw(env, demos, args):
-    rows = [rollout(env, d["actions"], d["seed"]) for d in demos]
+    """Replay the unmodified demo actions.  Rows carry the demo identity so
+    the verdict is attributable to a specific demonstration file."""
+    rows = []
+    for d in demos:
+        r = rollout(env, d["actions"], d["seed"])
+        for k in ("uuid", "index", "seed_rank", "clipped_frac",
+                  "demo_reward", "demo_steps", "demo_first_reward_step"):
+            if k in d:
+                r[k] = d[k]
+        rows.append(r)
     return {"rows": rows, **_agg(rows)}
 
 
@@ -542,8 +605,13 @@ def _agg(rows):
 def _worker(payload):
     args, shard, era, overrides, hold = payload
     np.random.seed(args.seed)
-    env = build_env(era, hold, overrides)
-    demos = load_demos(env, untrimmed=args.untrimmed)
+    env = build_env(era, hold, overrides,
+                    task=getattr(args, "task", "move_plate"),
+                    dsr=int(getattr(args, "dsr", 10)))
+    demos = load_demos(env, untrimmed=args.untrimmed,
+                       cache_root=getattr(args, "cache_root", None),
+                       order=getattr(args, "order", "seed"),
+                       keep_first=bool(getattr(args, "keep_first", False)))
     demos = [demos[i] for i in shard]
     try:
         if args.mode == "raw":
@@ -627,6 +695,28 @@ def main():
                         "'floating' = the era the stock demos were recorded in")
     p.add_argument("--hold", type=float, default=None,
                    help="success_hold_seconds override (default: era default)")
+    p.add_argument("--task", default="move_plate", choices=tuple(TASK_CONFIG),
+                   help="BiGym task; picks up enable_all_floating_dof and "
+                        "episode_length from cfgs/bigym_task/<task>.yaml")
+    p.add_argument("--dsr", type=int, default=10,
+                   help="demo_down_sample_rate. Sets BOTH the demo decimation "
+                        "frequency and the env control frequency "
+                        "(= 500 // dsr Hz); they cannot diverge. 500//dsr must "
+                        "stay in [20, 500], i.e. dsr in [1, 25].")
+    p.add_argument("--cache-root", default=None,
+                   help="private DemoStore cache root. Any frequency that is "
+                        "not cached yet is REGENERATED and written under this "
+                        "root; leave unset to use ~/.bigym (read-only in this "
+                        "project -- pass a private root before sweeping dsr).")
+    p.add_argument("--order", default="seed", choices=("seed", "uuid"),
+                   help="deterministic demo order used for sharding. Neither "
+                        "is DemoStore's own order (it shuffles); the reported "
+                        "per-row 'index' is always the uuid rank.")
+    p.add_argument("--keep-first", action="store_true", default=False,
+                   help="execute the demo's action[0] too. The default "
+                        "(off) reproduces the published Gate-1 numbers, "
+                        "which drop it; the cached demos have no dummy reset "
+                        "action, so dropping it replays one action short.")
     p.add_argument("--num-demos", type=int, default=20,
                    help="number of demos to replay (max 60 for move_plate)")
     p.add_argument("--j", type=str, default="2,3,5,9,16",

@@ -1,0 +1,2918 @@
+{
+  "_meta": {
+    "dsr": 10,
+    "era": "floating",
+    "hold": 0.0,
+    "cache_root": "/mnt/workspace/zoomq/gates/bigym_cache"
+  },
+  "move_plate": {
+    "n": 60,
+    "summary": {
+      "norm_drop1_limit": 0.75,
+      "norm_drop1_nolimit": 0.75,
+      "norm_all_limit": 0.8666666666666667,
+      "norm_all_nolimit": 0.8833333333333333,
+      "demo_recorded_success": 0.85
+    },
+    "rows": [
+      {
+        "index": 0,
+        "uuid": "09431449a6cf4931b5b85fa5b1c7426a",
+        "seed": 783198766,
+        "demo_recorded_reward": 0.0,
+        "norm_drop1_limit": {
+          "reward": 0.0,
+          "steps": 225,
+          "success": false
+        },
+        "norm_drop1_nolimit": {
+          "reward": 0.0,
+          "steps": 225,
+          "success": false
+        },
+        "norm_all_limit": {
+          "reward": 0.0,
+          "steps": 226,
+          "success": false
+        },
+        "norm_all_nolimit": {
+          "reward": 0.0,
+          "steps": 226,
+          "success": false
+        }
+      },
+      {
+        "index": 1,
+        "uuid": "0bb5f686ef7f46838c21721af9189c30",
+        "seed": 940869570,
+        "demo_recorded_reward": 27.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 163,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 163,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 164,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 164,
+          "success": true
+        }
+      },
+      {
+        "index": 2,
+        "uuid": "102f0940a27f40409e0c8fd901283e41",
+        "seed": 687812838,
+        "demo_recorded_reward": 26.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 153,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 153,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 155,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 155,
+          "success": true
+        }
+      },
+      {
+        "index": 3,
+        "uuid": "103d65f03899407ebc37ffed9a859f6d",
+        "seed": 330829590,
+        "demo_recorded_reward": 22.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 209,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 209,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 210,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 210,
+          "success": true
+        }
+      },
+      {
+        "index": 4,
+        "uuid": "1606bf53e91c42d68dad92431f9463eb",
+        "seed": 1089433139,
+        "demo_recorded_reward": 25.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 149,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 149,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 150,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 150,
+          "success": true
+        }
+      },
+      {
+        "index": 5,
+        "uuid": "1cdd529b28614f5c80e1f230b611c05c",
+        "seed": 3256091859,
+        "demo_recorded_reward": 24.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 128,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 128,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 128,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 128,
+          "success": true
+        }
+      },
+      {
+        "index": 6,
+        "uuid": "2948981a8f0f42f8ac715afe65269b14",
+        "seed": 3622114549,
+        "demo_recorded_reward": 12.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 152,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 152,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 154,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 154,
+          "success": true
+        }
+      },
+      {
+        "index": 7,
+        "uuid": "36ca6107b88d4095bb37f4e26bd9daa5",
+        "seed": 2873158007,
+        "demo_recorded_reward": 23.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 150,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 150,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 153,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 153,
+          "success": true
+        }
+      },
+      {
+        "index": 8,
+        "uuid": "3ab9acb6b5f14f9983cc03419afb0f24",
+        "seed": 4202197896,
+        "demo_recorded_reward": 25.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 183,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 183,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 184,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 184,
+          "success": true
+        }
+      },
+      {
+        "index": 9,
+        "uuid": "3ef437fee59c428fbdefe22682d1b4f1",
+        "seed": 884115701,
+        "demo_recorded_reward": 18.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 130,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 130,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 133,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 133,
+          "success": true
+        }
+      },
+      {
+        "index": 10,
+        "uuid": "4b8ba65d19894ecfba58615d4f9118e7",
+        "seed": 688626807,
+        "demo_recorded_reward": 0.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 140,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 140,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 133,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 133,
+          "success": true
+        }
+      },
+      {
+        "index": 11,
+        "uuid": "539d8f96eb7e430cbee525ad865ce5e7",
+        "seed": 3426226620,
+        "demo_recorded_reward": 25.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 141,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 141,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 142,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 142,
+          "success": true
+        }
+      },
+      {
+        "index": 12,
+        "uuid": "53ceed3b18db4b40a85fc9a467d99c82",
+        "seed": 4052722002,
+        "demo_recorded_reward": 26.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 162,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 162,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 162,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 162,
+          "success": true
+        }
+      },
+      {
+        "index": 13,
+        "uuid": "57a29e4b93d5459689e36334ac35b520",
+        "seed": 4089832376,
+        "demo_recorded_reward": 0.0,
+        "norm_drop1_limit": {
+          "reward": 0.0,
+          "steps": 183,
+          "success": false
+        },
+        "norm_drop1_nolimit": {
+          "reward": 0.0,
+          "steps": 183,
+          "success": false
+        },
+        "norm_all_limit": {
+          "reward": 0.0,
+          "steps": 184,
+          "success": false
+        },
+        "norm_all_nolimit": {
+          "reward": 0.0,
+          "steps": 184,
+          "success": false
+        }
+      },
+      {
+        "index": 14,
+        "uuid": "5d998f63ca714d53abb8d71ca1dde7d4",
+        "seed": 2844286583,
+        "demo_recorded_reward": 26.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 129,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 129,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 129,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 129,
+          "success": true
+        }
+      },
+      {
+        "index": 15,
+        "uuid": "647dd7dabc2f44498dc5112bab5bdf19",
+        "seed": 4247313619,
+        "demo_recorded_reward": 23.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 163,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 163,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 168,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 168,
+          "success": true
+        }
+      },
+      {
+        "index": 16,
+        "uuid": "64c85c1de20a425da411e91494f3b28a",
+        "seed": 2305693732,
+        "demo_recorded_reward": 27.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 148,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 148,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 149,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 149,
+          "success": true
+        }
+      },
+      {
+        "index": 17,
+        "uuid": "6a71d94aa9dc49b3a24cf90e38c86a7e",
+        "seed": 2902731532,
+        "demo_recorded_reward": 26.0,
+        "norm_drop1_limit": {
+          "reward": 0.0,
+          "steps": 152,
+          "success": false
+        },
+        "norm_drop1_nolimit": {
+          "reward": 0.0,
+          "steps": 152,
+          "success": false
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 129,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 129,
+          "success": true
+        }
+      },
+      {
+        "index": 18,
+        "uuid": "6ad83bfeceb44e0db3b08d32dbc29488",
+        "seed": 2515225647,
+        "demo_recorded_reward": 25.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 182,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 182,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 183,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 183,
+          "success": true
+        }
+      },
+      {
+        "index": 19,
+        "uuid": "6e9e3bed4c0547f08d64b8b865c6a61c",
+        "seed": 2881376698,
+        "demo_recorded_reward": 24.0,
+        "norm_drop1_limit": {
+          "reward": 0.0,
+          "steps": 196,
+          "success": false
+        },
+        "norm_drop1_nolimit": {
+          "reward": 0.0,
+          "steps": 196,
+          "success": false
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 175,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 175,
+          "success": true
+        }
+      },
+      {
+        "index": 20,
+        "uuid": "7100432357a14911ab67937c460c7faa",
+        "seed": 2770827027,
+        "demo_recorded_reward": 20.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 129,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 129,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 133,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 133,
+          "success": true
+        }
+      },
+      {
+        "index": 21,
+        "uuid": "765f42dfcd454bee9ad3e5f9217e6f43",
+        "seed": 3129168941,
+        "demo_recorded_reward": 0.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 160,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 160,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 0.0,
+          "steps": 182,
+          "success": false
+        },
+        "norm_all_nolimit": {
+          "reward": 0.0,
+          "steps": 182,
+          "success": false
+        }
+      },
+      {
+        "index": 22,
+        "uuid": "76cffeff765741daa00e861f63eb4945",
+        "seed": 1524578059,
+        "demo_recorded_reward": 0.0,
+        "norm_drop1_limit": {
+          "reward": 0.0,
+          "steps": 221,
+          "success": false
+        },
+        "norm_drop1_nolimit": {
+          "reward": 0.0,
+          "steps": 221,
+          "success": false
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 198,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 198,
+          "success": true
+        }
+      },
+      {
+        "index": 23,
+        "uuid": "76ee1e35d6974357bf3f97276571ea5b",
+        "seed": 3394323475,
+        "demo_recorded_reward": 24.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 201,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 201,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 202,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 202,
+          "success": true
+        }
+      },
+      {
+        "index": 24,
+        "uuid": "77bf502cd9cc4ed8ab51973a645e8a7e",
+        "seed": 2808477739,
+        "demo_recorded_reward": 27.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 159,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 159,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 160,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 160,
+          "success": true
+        }
+      },
+      {
+        "index": 25,
+        "uuid": "7c29f4e469134ce3aa0716eac326a7cc",
+        "seed": 1647355863,
+        "demo_recorded_reward": 0.0,
+        "norm_drop1_limit": {
+          "reward": 0.0,
+          "steps": 170,
+          "success": false
+        },
+        "norm_drop1_nolimit": {
+          "reward": 0.0,
+          "steps": 170,
+          "success": false
+        },
+        "norm_all_limit": {
+          "reward": 0.0,
+          "steps": 171,
+          "success": false
+        },
+        "norm_all_nolimit": {
+          "reward": 0.0,
+          "steps": 171,
+          "success": false
+        }
+      },
+      {
+        "index": 26,
+        "uuid": "7cfa15a5409a414f9da1afae09eddbb1",
+        "seed": 940041192,
+        "demo_recorded_reward": 0.0,
+        "norm_drop1_limit": {
+          "reward": 0.0,
+          "steps": 162,
+          "success": false
+        },
+        "norm_drop1_nolimit": {
+          "reward": 0.0,
+          "steps": 162,
+          "success": false
+        },
+        "norm_all_limit": {
+          "reward": 0.0,
+          "steps": 163,
+          "success": false
+        },
+        "norm_all_nolimit": {
+          "reward": 0.0,
+          "steps": 163,
+          "success": false
+        }
+      },
+      {
+        "index": 27,
+        "uuid": "85a55cc389f7414a8762fa92c7a07541",
+        "seed": 2006349329,
+        "demo_recorded_reward": 26.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 154,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 154,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 157,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 157,
+          "success": true
+        }
+      },
+      {
+        "index": 28,
+        "uuid": "8b3f476d286b4aa880afe5be2dca48d3",
+        "seed": 15724707,
+        "demo_recorded_reward": 22.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 170,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 170,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 173,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 173,
+          "success": true
+        }
+      },
+      {
+        "index": 29,
+        "uuid": "8beece23e04b40b5857c2fb64500abb6",
+        "seed": 666157710,
+        "demo_recorded_reward": 0.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 160,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 160,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 0.0,
+          "steps": 187,
+          "success": false
+        },
+        "norm_all_nolimit": {
+          "reward": 0.0,
+          "steps": 187,
+          "success": false
+        }
+      },
+      {
+        "index": 30,
+        "uuid": "8f5ab73470434b9dbcc837a519d91e00",
+        "seed": 3067160545,
+        "demo_recorded_reward": 24.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 158,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 158,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 160,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 160,
+          "success": true
+        }
+      },
+      {
+        "index": 31,
+        "uuid": "913a5a0e359c4e64bf64dd46dd838bc8",
+        "seed": 505795741,
+        "demo_recorded_reward": 25.0,
+        "norm_drop1_limit": {
+          "reward": 0.0,
+          "steps": 183,
+          "success": false
+        },
+        "norm_drop1_nolimit": {
+          "reward": 0.0,
+          "steps": 183,
+          "success": false
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 160,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 160,
+          "success": true
+        }
+      },
+      {
+        "index": 32,
+        "uuid": "a1d99271a58247afab2f557db448891c",
+        "seed": 1155408273,
+        "demo_recorded_reward": 25.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 170,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 170,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 169,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 169,
+          "success": true
+        }
+      },
+      {
+        "index": 33,
+        "uuid": "a24464709e974ab58f1aa6c1d2fc587c",
+        "seed": 1204749139,
+        "demo_recorded_reward": 27.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 167,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 167,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 168,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 168,
+          "success": true
+        }
+      },
+      {
+        "index": 34,
+        "uuid": "a49f888fde60466eaead940b2142e80c",
+        "seed": 841051473,
+        "demo_recorded_reward": 3.0,
+        "norm_drop1_limit": {
+          "reward": 0.0,
+          "steps": 164,
+          "success": false
+        },
+        "norm_drop1_nolimit": {
+          "reward": 0.0,
+          "steps": 164,
+          "success": false
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 140,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 140,
+          "success": true
+        }
+      },
+      {
+        "index": 35,
+        "uuid": "a5a8e52062e448e39438e34271e8f9d6",
+        "seed": 2836187108,
+        "demo_recorded_reward": 24.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 134,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 134,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 135,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 135,
+          "success": true
+        }
+      },
+      {
+        "index": 36,
+        "uuid": "b737fd563575402b804026262f68da7d",
+        "seed": 1009029633,
+        "demo_recorded_reward": 24.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 125,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 125,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 126,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 126,
+          "success": true
+        }
+      },
+      {
+        "index": 37,
+        "uuid": "b9c2d735f1214b4abab2b452def89d93",
+        "seed": 4259283573,
+        "demo_recorded_reward": 24.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 130,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 130,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 129,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 129,
+          "success": true
+        }
+      },
+      {
+        "index": 38,
+        "uuid": "c0b6ede7982b4ca583bf1b5e5fcbdbe9",
+        "seed": 633051757,
+        "demo_recorded_reward": 24.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 149,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 149,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 150,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 150,
+          "success": true
+        }
+      },
+      {
+        "index": 39,
+        "uuid": "c17367c7550d4b1e9f1b72f91354a9a2",
+        "seed": 662707335,
+        "demo_recorded_reward": 24.0,
+        "norm_drop1_limit": {
+          "reward": 0.0,
+          "steps": 132,
+          "success": false
+        },
+        "norm_drop1_nolimit": {
+          "reward": 0.0,
+          "steps": 132,
+          "success": false
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 109,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 109,
+          "success": true
+        }
+      },
+      {
+        "index": 40,
+        "uuid": "c795f62efb4f4d20ab899af96d766a2f",
+        "seed": 881409375,
+        "demo_recorded_reward": 23.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 200,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 200,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 200,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 200,
+          "success": true
+        }
+      },
+      {
+        "index": 41,
+        "uuid": "c83f68f6afc84920bda0455e6a87e4d6",
+        "seed": 3854400598,
+        "demo_recorded_reward": 23.0,
+        "norm_drop1_limit": {
+          "reward": 0.0,
+          "steps": 203,
+          "success": false
+        },
+        "norm_drop1_nolimit": {
+          "reward": 0.0,
+          "steps": 203,
+          "success": false
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 178,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 178,
+          "success": true
+        }
+      },
+      {
+        "index": 42,
+        "uuid": "cceb3240f6eb44719bb91b77f79ff26f",
+        "seed": 693555820,
+        "demo_recorded_reward": 23.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 147,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 147,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 150,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 150,
+          "success": true
+        }
+      },
+      {
+        "index": 43,
+        "uuid": "cee3a5a8b558455f87f307b83e5a72ba",
+        "seed": 2277139738,
+        "demo_recorded_reward": 5.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 191,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 191,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 187,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 187,
+          "success": true
+        }
+      },
+      {
+        "index": 44,
+        "uuid": "d1bfcd7374ab41d39affbf6350291a28",
+        "seed": 157315917,
+        "demo_recorded_reward": 22.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 129,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 129,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 126,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 126,
+          "success": true
+        }
+      },
+      {
+        "index": 45,
+        "uuid": "d3d47ca2cfed4518adc50b6a5401e37b",
+        "seed": 1733806836,
+        "demo_recorded_reward": 26.0,
+        "norm_drop1_limit": {
+          "reward": 0.0,
+          "steps": 149,
+          "success": false
+        },
+        "norm_drop1_nolimit": {
+          "reward": 0.0,
+          "steps": 149,
+          "success": false
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 125,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 125,
+          "success": true
+        }
+      },
+      {
+        "index": 46,
+        "uuid": "d47012004888461fa639a9504e1ce902",
+        "seed": 143646756,
+        "demo_recorded_reward": 25.0,
+        "norm_drop1_limit": {
+          "reward": 0.0,
+          "steps": 300,
+          "success": false
+        },
+        "norm_drop1_nolimit": {
+          "reward": 0.0,
+          "steps": 333,
+          "success": false
+        },
+        "norm_all_limit": {
+          "reward": 0.0,
+          "steps": 300,
+          "success": false
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 311,
+          "success": true
+        }
+      },
+      {
+        "index": 47,
+        "uuid": "d7d8a00785cf4c4a82e486082310fd3f",
+        "seed": 3181141660,
+        "demo_recorded_reward": 26.0,
+        "norm_drop1_limit": {
+          "reward": 0.0,
+          "steps": 201,
+          "success": false
+        },
+        "norm_drop1_nolimit": {
+          "reward": 0.0,
+          "steps": 201,
+          "success": false
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 177,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 177,
+          "success": true
+        }
+      },
+      {
+        "index": 48,
+        "uuid": "dabdcf9518ac45cf80a1ad0c21757d8f",
+        "seed": 439157550,
+        "demo_recorded_reward": 23.0,
+        "norm_drop1_limit": {
+          "reward": 0.0,
+          "steps": 200,
+          "success": false
+        },
+        "norm_drop1_nolimit": {
+          "reward": 0.0,
+          "steps": 200,
+          "success": false
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 179,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 179,
+          "success": true
+        }
+      },
+      {
+        "index": 49,
+        "uuid": "daf7272056e24eeb8a9e63a81a30fdce",
+        "seed": 4237814948,
+        "demo_recorded_reward": 26.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 164,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 164,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 165,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 165,
+          "success": true
+        }
+      },
+      {
+        "index": 50,
+        "uuid": "db04fcbb3b0045cbb38c722cbdc482b0",
+        "seed": 2332030217,
+        "demo_recorded_reward": 25.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 127,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 127,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 127,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 127,
+          "success": true
+        }
+      },
+      {
+        "index": 51,
+        "uuid": "ddefe97715a0474aa9210a179467d29b",
+        "seed": 3247036697,
+        "demo_recorded_reward": 24.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 142,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 142,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 139,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 139,
+          "success": true
+        }
+      },
+      {
+        "index": 52,
+        "uuid": "e03106b157364d48b6e4a6cc9875f3aa",
+        "seed": 2217121471,
+        "demo_recorded_reward": 25.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 161,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 161,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 162,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 162,
+          "success": true
+        }
+      },
+      {
+        "index": 53,
+        "uuid": "e8071cb69d8a49d5b5f697ba2334e830",
+        "seed": 2908632753,
+        "demo_recorded_reward": 16.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 162,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 162,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 161,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 161,
+          "success": true
+        }
+      },
+      {
+        "index": 54,
+        "uuid": "e91543924e0e417d82461203d833128a",
+        "seed": 3773153836,
+        "demo_recorded_reward": 23.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 156,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 156,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 156,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 156,
+          "success": true
+        }
+      },
+      {
+        "index": 55,
+        "uuid": "ebdf2dd1e46f41ed8b301bb403c9c336",
+        "seed": 1705830493,
+        "demo_recorded_reward": 27.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 149,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 149,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 150,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 150,
+          "success": true
+        }
+      },
+      {
+        "index": 56,
+        "uuid": "ec4d804ddf8f49e7939ce16f00ef67c6",
+        "seed": 3813056491,
+        "demo_recorded_reward": 26.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 134,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 134,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 135,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 135,
+          "success": true
+        }
+      },
+      {
+        "index": 57,
+        "uuid": "f0745c6761504bd0b93165060cdb4a69",
+        "seed": 1662921722,
+        "demo_recorded_reward": 24.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 147,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 147,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 149,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 149,
+          "success": true
+        }
+      },
+      {
+        "index": 58,
+        "uuid": "f2eee0d3a5b64f8494df058bf2387964",
+        "seed": 3634028145,
+        "demo_recorded_reward": 24.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 138,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 138,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 142,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 142,
+          "success": true
+        }
+      },
+      {
+        "index": 59,
+        "uuid": "fa2c53e079c745ff9733f463732d244f",
+        "seed": 1935868678,
+        "demo_recorded_reward": 0.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 183,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 183,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 0.0,
+          "steps": 207,
+          "success": false
+        },
+        "norm_all_nolimit": {
+          "reward": 0.0,
+          "steps": 207,
+          "success": false
+        }
+      }
+    ]
+  },
+  "drawer_top_close": {
+    "n": 51,
+    "summary": {
+      "norm_drop1_limit": 1.0,
+      "norm_drop1_nolimit": 1.0,
+      "norm_all_limit": 1.0,
+      "norm_all_nolimit": 1.0,
+      "demo_recorded_success": 1.0
+    },
+    "rows": [
+      {
+        "index": 0,
+        "uuid": "03fb8e63020b4151a84c33890eb1bc16",
+        "seed": 1488982286,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 63,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 63,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 64,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 64,
+          "success": true
+        }
+      },
+      {
+        "index": 1,
+        "uuid": "0b50b4b562be40a4902e0ab0d7dfa596",
+        "seed": 532822275,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 65,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 65,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 67,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 67,
+          "success": true
+        }
+      },
+      {
+        "index": 2,
+        "uuid": "0f102fffe2b24c86baa064bb88e77afd",
+        "seed": 1555759747,
+        "demo_recorded_reward": 105.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 77,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 77,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 78,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 78,
+          "success": true
+        }
+      },
+      {
+        "index": 3,
+        "uuid": "1ae135498536401e819649318e6565a8",
+        "seed": 3933956405,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 73,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 73,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 75,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 75,
+          "success": true
+        }
+      },
+      {
+        "index": 4,
+        "uuid": "24fd1fa972ce46d8843a913e902369a1",
+        "seed": 3895898254,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 62,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 62,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 63,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 63,
+          "success": true
+        }
+      },
+      {
+        "index": 5,
+        "uuid": "2861649a387f439793461940ab880e93",
+        "seed": 6071878,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 71,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 71,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 73,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 73,
+          "success": true
+        }
+      },
+      {
+        "index": 6,
+        "uuid": "2874abd3781a468588ba5ebb1c83cf8e",
+        "seed": 4209447179,
+        "demo_recorded_reward": 105.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 73,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 73,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 74,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 74,
+          "success": true
+        }
+      },
+      {
+        "index": 7,
+        "uuid": "2d0ebedcb6f74fa9940e1744d1214e79",
+        "seed": 87528580,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 54,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 54,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 55,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 55,
+          "success": true
+        }
+      },
+      {
+        "index": 8,
+        "uuid": "328b2dc737944f6e8ab2a976ea2e3054",
+        "seed": 4235606981,
+        "demo_recorded_reward": 105.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 64,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 64,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 66,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 66,
+          "success": true
+        }
+      },
+      {
+        "index": 9,
+        "uuid": "36fa17fd6c9841d9b036c4fdcb8df09e",
+        "seed": 813212857,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 57,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 57,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 58,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 58,
+          "success": true
+        }
+      },
+      {
+        "index": 10,
+        "uuid": "3ab518905fc94ba7b306c8c5f38fb6f3",
+        "seed": 1462978698,
+        "demo_recorded_reward": 103.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 56,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 56,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 58,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 58,
+          "success": true
+        }
+      },
+      {
+        "index": 11,
+        "uuid": "44bb7fa9547b46e3ab35b76ddc34d3c3",
+        "seed": 4044581813,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 57,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 57,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 58,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 58,
+          "success": true
+        }
+      },
+      {
+        "index": 12,
+        "uuid": "4830bfd2af4c4580b6e572e23b235b9a",
+        "seed": 3319872860,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 50,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 50,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 52,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 52,
+          "success": true
+        }
+      },
+      {
+        "index": 13,
+        "uuid": "48a64e49eb9a4d1d996a634f3168e2b9",
+        "seed": 2217890207,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 62,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 62,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 63,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 63,
+          "success": true
+        }
+      },
+      {
+        "index": 14,
+        "uuid": "4a8db0922d424064b1b048b92e79d9d6",
+        "seed": 2285436345,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 53,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 53,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 55,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 55,
+          "success": true
+        }
+      },
+      {
+        "index": 15,
+        "uuid": "4e5f1a9378524def9e7d687775835187",
+        "seed": 533691089,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 54,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 54,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 55,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 55,
+          "success": true
+        }
+      },
+      {
+        "index": 16,
+        "uuid": "50b49e61916f42d4a9e970e6e774c732",
+        "seed": 3709579031,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 70,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 70,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 72,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 72,
+          "success": true
+        }
+      },
+      {
+        "index": 17,
+        "uuid": "52d11807312748699ec2950eb42369a4",
+        "seed": 1916571389,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 71,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 71,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 73,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 73,
+          "success": true
+        }
+      },
+      {
+        "index": 18,
+        "uuid": "56b35ab2d5a74b46a206a33b48fde5cf",
+        "seed": 220297626,
+        "demo_recorded_reward": 105.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 52,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 52,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 53,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 53,
+          "success": true
+        }
+      },
+      {
+        "index": 19,
+        "uuid": "5853daa1faed4e249001e8504e502bf6",
+        "seed": 4274225218,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 61,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 61,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 62,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 62,
+          "success": true
+        }
+      },
+      {
+        "index": 20,
+        "uuid": "58e502101c4b4137ab09c317706a5c7b",
+        "seed": 3317048467,
+        "demo_recorded_reward": 105.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 83,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 83,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 84,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 84,
+          "success": true
+        }
+      },
+      {
+        "index": 21,
+        "uuid": "5b087933b7d44b3eb1dd8d3ed0af5734",
+        "seed": 3871033472,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 59,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 59,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 60,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 60,
+          "success": true
+        }
+      },
+      {
+        "index": 22,
+        "uuid": "5f6f2892e4654460935a87728dd3eacb",
+        "seed": 2613786084,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 66,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 66,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 67,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 67,
+          "success": true
+        }
+      },
+      {
+        "index": 23,
+        "uuid": "749591ab9b4e446892c763aef72cf88f",
+        "seed": 201561684,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 65,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 65,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 66,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 66,
+          "success": true
+        }
+      },
+      {
+        "index": 24,
+        "uuid": "759d4c6e045042b4a31e5a8ea28c5c3a",
+        "seed": 885715397,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 55,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 55,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 57,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 57,
+          "success": true
+        }
+      },
+      {
+        "index": 25,
+        "uuid": "856e9b793050486e9d0db47ce37db3ec",
+        "seed": 3864761431,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 71,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 71,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 73,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 73,
+          "success": true
+        }
+      },
+      {
+        "index": 26,
+        "uuid": "8bb3c0a2cc484d88888ab708418f7e93",
+        "seed": 4094926605,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 62,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 62,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 63,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 63,
+          "success": true
+        }
+      },
+      {
+        "index": 27,
+        "uuid": "8c3179b000694552895a05c569f91159",
+        "seed": 2130645560,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 58,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 58,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 60,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 60,
+          "success": true
+        }
+      },
+      {
+        "index": 28,
+        "uuid": "91706a8b3cf7430c9de8980e5a569b73",
+        "seed": 3814230101,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 56,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 56,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 57,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 57,
+          "success": true
+        }
+      },
+      {
+        "index": 29,
+        "uuid": "94a28c0c4c284d66beeecb2dcc5226e3",
+        "seed": 399235953,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 57,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 57,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 58,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 58,
+          "success": true
+        }
+      },
+      {
+        "index": 30,
+        "uuid": "9fbeb9781fe4409eb548e0820c8d372c",
+        "seed": 3712325743,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 57,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 57,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 59,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 59,
+          "success": true
+        }
+      },
+      {
+        "index": 31,
+        "uuid": "a04fab84616f429982dba1c121910686",
+        "seed": 214457542,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 60,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 60,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 61,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 61,
+          "success": true
+        }
+      },
+      {
+        "index": 32,
+        "uuid": "b186aecae0ce42dcbd8a51ffa6ece640",
+        "seed": 1786211523,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 55,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 55,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 56,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 56,
+          "success": true
+        }
+      },
+      {
+        "index": 33,
+        "uuid": "b323e9935cd849ab81616ebca95528fe",
+        "seed": 3687941606,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 63,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 63,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 64,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 64,
+          "success": true
+        }
+      },
+      {
+        "index": 34,
+        "uuid": "bcc55571ec784e2ab04346bd0f2f5578",
+        "seed": 2663349953,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 56,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 56,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 58,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 58,
+          "success": true
+        }
+      },
+      {
+        "index": 35,
+        "uuid": "bd737df513874b5dbc77686d5ee1e0d3",
+        "seed": 2860756765,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 56,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 56,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 58,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 58,
+          "success": true
+        }
+      },
+      {
+        "index": 36,
+        "uuid": "bf5be3d47ef64b7f8cf6ce028802476b",
+        "seed": 3327359450,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 61,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 61,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 62,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 62,
+          "success": true
+        }
+      },
+      {
+        "index": 37,
+        "uuid": "c0d26c2a5420403caf30ae75a106ff83",
+        "seed": 1448969570,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 66,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 66,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 67,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 67,
+          "success": true
+        }
+      },
+      {
+        "index": 38,
+        "uuid": "c883187dd2494484a7231042f5f9a353",
+        "seed": 885742399,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 77,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 77,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 79,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 79,
+          "success": true
+        }
+      },
+      {
+        "index": 39,
+        "uuid": "d1ba0163c34c4425ac0ebe798a60ab7e",
+        "seed": 4201141267,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 55,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 55,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 56,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 56,
+          "success": true
+        }
+      },
+      {
+        "index": 40,
+        "uuid": "d7473a676e194dcf86a29401ef33ea22",
+        "seed": 2599663615,
+        "demo_recorded_reward": 106.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 94,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 94,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 95,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 95,
+          "success": true
+        }
+      },
+      {
+        "index": 41,
+        "uuid": "db3165a68dfd43dda792eaa2ce85dfb8",
+        "seed": 495458408,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 57,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 57,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 58,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 58,
+          "success": true
+        }
+      },
+      {
+        "index": 42,
+        "uuid": "dbc63a0fab274e5d9143f9de9e5ffc6c",
+        "seed": 1706832415,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 71,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 71,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 73,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 73,
+          "success": true
+        }
+      },
+      {
+        "index": 43,
+        "uuid": "e04bdc3dbf3c433989e55f50a68a6291",
+        "seed": 3877123326,
+        "demo_recorded_reward": 105.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 58,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 58,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 60,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 60,
+          "success": true
+        }
+      },
+      {
+        "index": 44,
+        "uuid": "ec3c62c03c514bf0b15b46e1ebfb90a6",
+        "seed": 2971856483,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 51,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 51,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 52,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 52,
+          "success": true
+        }
+      },
+      {
+        "index": 45,
+        "uuid": "ef4ae065446049b38e841360bb17d9f4",
+        "seed": 2301874645,
+        "demo_recorded_reward": 105.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 91,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 91,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 92,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 92,
+          "success": true
+        }
+      },
+      {
+        "index": 46,
+        "uuid": "f4fb3bb1c0ad48798c29ca2a1490b0a6",
+        "seed": 2778432530,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 53,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 53,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 54,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 54,
+          "success": true
+        }
+      },
+      {
+        "index": 47,
+        "uuid": "f70c27b6097243639de43b89dbf0d0ad",
+        "seed": 1922095280,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 59,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 59,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 60,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 60,
+          "success": true
+        }
+      },
+      {
+        "index": 48,
+        "uuid": "f913c1a124f9452a971ba95c09799831",
+        "seed": 4058403757,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 70,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 70,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 72,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 72,
+          "success": true
+        }
+      },
+      {
+        "index": 49,
+        "uuid": "fa212e5302c945a8b7418d939e6fe432",
+        "seed": 2762207769,
+        "demo_recorded_reward": 103.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 55,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 55,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 57,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 57,
+          "success": true
+        }
+      },
+      {
+        "index": 50,
+        "uuid": "fd68cd5c7d4d4ffbb40a8dea8f8731be",
+        "seed": 179338524,
+        "demo_recorded_reward": 104.0,
+        "norm_drop1_limit": {
+          "reward": 1.0,
+          "steps": 66,
+          "success": true
+        },
+        "norm_drop1_nolimit": {
+          "reward": 1.0,
+          "steps": 66,
+          "success": true
+        },
+        "norm_all_limit": {
+          "reward": 1.0,
+          "steps": 67,
+          "success": true
+        },
+        "norm_all_nolimit": {
+          "reward": 1.0,
+          "steps": 67,
+          "success": true
+        }
+      }
+    ]
+  }
+}

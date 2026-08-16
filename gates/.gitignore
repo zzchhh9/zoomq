@@ -1,0 +1,6 @@
+# Private DemoStore caches built by build_private_demo_cache.sh +
+# gate1_prebuild_rates.py (regenerated demo .safetensors, ~350 MB).
+# Rebuild with:  bash build_private_demo_cache.sh
+#                gate1_prebuild_rates.py <task> <dsr> <cache_root>
+bigym_cache/
+bigym_cache_regen50/
