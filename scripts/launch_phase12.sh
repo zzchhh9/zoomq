@@ -29,6 +29,19 @@
 #   all comfortably under the repo yaml (1050/850/1550/1250/1100). Overriding to
 #   the paper's numbers would truncate every demonstration.
 #
+# in_train_eval=false + save_eval_snapshot=true — the repo's own LAUNCH RULE
+#   (CLAUDE.md:362). In-train evaluation runs on the training process, and on
+#   these tasks it is ruinous: 25 episodes x 1050-1550 steps is 26k-39k env
+#   steps per eval against a 10k-step interval, i.e. 2.6-3.9x the training cost.
+#   Snapshots are still written; evaluate them with scripts/eval_daemon.py on
+#   the idle cores, at --episodes 100 (25-episode numbers carry +-10pt noise).
+#
+# WORKERS=8 — py-spy over 2296 samples of a live arm: 49% MuJoCo step + camera
+#   render, 22% the update, and 16% in the replay DataLoader (pin_memory 10.4%,
+#   do_one_step 5.7%) at the default 2 workers. CLAUDE.md §2.5 says be generous
+#   with workers on a 184-core box. Keep it identical across arms — it changes
+#   the sampling interleaving, hence the RNG stream.
+#
 # DEMO_HOME — the public release carries 40 tasks; ali's shared cache had only
 #   11 extracted, and under a 3-floating-DOF directory name while the code
 #   requests 4. An isolated cache avoids touching shared state.
@@ -74,9 +87,10 @@ next_ppu() { ppu=$(( (ppu + 1) % 16 )); }
 arm() {
   local name="$1" cfg="$2" task="$3" seed="$4" ev="$5"; shift 5
   in_stage "$name" || return 0
-  $DRY env DEMO_HOME="$DEMO_HOME" SEED="$seed" EVAL_EVERY="$ev" EVAL_EPS=25 \
+  $DRY env DEMO_HOME="$DEMO_HOME" SEED="$seed" EVAL_EVERY="$ev" EVAL_EPS=25 WORKERS=8 \
     setsid nohup $L "$name" "$ppu" "$cfg" \
-      bigym_task="$task" $FLOAT "$@" \
+      bigym_task="$task" $FLOAT \
+      in_train_eval=false save_eval_snapshot=true "$@" \
       > "logs/${name}.log" 2>&1 < /dev/null &
   next_ppu
   sleep 2
@@ -89,7 +103,7 @@ arm() {
 #   Move Plate       CQN-AS 64.0 +- 7.5
 #   Saucepan To Hob  CQN-AS 80.5 +- 13.3
 for s in 1 2 3; do
-  arm "p1_mp_s${s}"  - move_plate      "$s" 5000
+  arm "p1_mp_s${s}"  - move_plate      "$s" 10000
   arm "p1_sh_s${s}"  - saucepan_to_hob "$s" 10000
 done
 
