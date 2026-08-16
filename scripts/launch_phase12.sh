@@ -35,7 +35,30 @@
 set -euo pipefail
 
 DRY=""
-[ "${1:-}" = "--dry-run" ] && DRY="echo [dry-run]"
+STAGE="all"
+for a in "$@"; do
+  case "$a" in
+    --dry-run) DRY="echo [dry-run]" ;;
+    --stage=*) STAGE="${a#--stage=}" ;;
+  esac
+done
+
+# Demonstrations ship state-only; the pixel observations are RENDERED on first
+# use, ~7.6 min per demo on the long tasks (Take Cups demos are 881 outer steps).
+# Six arms per task would render the same cache six times over AND race on the
+# same safetensors paths, so stage `cache` runs exactly one arm per task and
+# stage `rest` starts the others once those caches exist.
+#   --stage=cache   one arm per task (6)
+#   --stage=rest    the remaining 24
+#   --stage=all     everything (only safe once the caches are built)
+in_stage() {
+  case "$STAGE" in
+    all)   return 0 ;;
+    cache) case "$1" in p1_mp_s1|p1_sh_s1|p2_tc_base_s1|p2_pc_base_s1|p2_du_base_s1|p2_fc_base_s1) return 0 ;; *) return 1 ;; esac ;;
+    rest)  case "$1" in p1_mp_s1|p1_sh_s1|p2_tc_base_s1|p2_pc_base_s1|p2_du_base_s1|p2_fc_base_s1) return 1 ;; *) return 0 ;; esac ;;
+  esac
+  return 0
+}
 
 cd /mnt/workspace/zoomq
 L=./scripts/launch_arm.sh
@@ -50,6 +73,7 @@ next_ppu() { ppu=$(( (ppu + 1) % 16 )); }
 # arm <name> <config|-> <task> <seed> <eval_every> <extra...>
 arm() {
   local name="$1" cfg="$2" task="$3" seed="$4" ev="$5"; shift 5
+  in_stage "$name" || return 0
   $DRY env DEMO_HOME="$DEMO_HOME" SEED="$seed" EVAL_EVERY="$ev" EVAL_EPS=25 \
     setsid nohup $L "$name" "$ppu" "$cfg" \
       bigym_task="$task" $FLOAT "$@" \
@@ -90,4 +114,4 @@ for s in 1 2; do
   done
 done
 
-echo "launched: 6 Phase-1 arms + 24 Phase-2 arms"
+echo "stage=${STAGE} launched"
