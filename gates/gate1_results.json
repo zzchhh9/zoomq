@@ -1,0 +1,556 @@
+{
+  "task": "move_plate",
+  "chunk_len": 16,
+  "knot_sets": {
+    "2": [
+      0,
+      15
+    ],
+    "3": [
+      0,
+      7,
+      15
+    ],
+    "5": [
+      0,
+      3,
+      7,
+      11,
+      15
+    ],
+    "9": [
+      0,
+      1,
+      3,
+      5,
+      7,
+      9,
+      11,
+      13,
+      15
+    ],
+    "16": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ]
+  },
+  "demos": {
+    "source": "stock BiGym DemoStore cache 0.9.0, MovePlate/JointPositionActionMode_floating_pelvis_x_pelvis_y_pelvis_rz_absolute, state/50hz, 60 demos",
+    "n_available": 60,
+    "recorded_under": "mujoco 3.1.5 / bigym 4.0.0; replayed under mujoco 3.11.0 / bigym 4.1.0",
+    "replay_protocol": "env.reset(seed=demo.seed); execute the demo's own actions from index 1 (index 0 is the reset step's dummy action); full recorded demo, not truncated at the first rewarding step"
+  },
+  "step1_raw_replay": {
+    "note": "success = episode_reward >= 0.25, the repo's own eval predicate (train_cqn_as_bigym.py eval_success_reward_threshold).",
+    "table": {
+      "homie_prod_hold1.0_z0.92": {
+        "n": 60,
+        "success_rate": 0.0,
+        "mean_reward": 0.0
+      },
+      "homie_hold0_z0.92": {
+        "n": 60,
+        "success_rate": 0.016666666666666666,
+        "mean_reward": 0.016666666666666666
+      },
+      "homie_hold1.0_z1.00": {
+        "n": 60,
+        "success_rate": 0.0,
+        "mean_reward": 0.0
+      },
+      "homie_hold0_z1.00": {
+        "n": 60,
+        "success_rate": 0.0,
+        "mean_reward": 0.0
+      },
+      "homie_hold0_z0.92_warmup0": {
+        "n": 60,
+        "success_rate": 0.06666666666666667,
+        "mean_reward": 0.06666666666666667
+      },
+      "homie_hold0_z0.92_nortz": {
+        "n": 60,
+        "success_rate": 0.0,
+        "mean_reward": 0.0
+      },
+      "homie_hold0_z0.92_cmdclip5": {
+        "n": 60,
+        "success_rate": 0.1,
+        "mean_reward": 0.1
+      },
+      "floating_hold1.0": {
+        "n": 60,
+        "success_rate": 0.0,
+        "mean_reward": 0.0
+      },
+      "floating_hold0": {
+        "n": 60,
+        "success_rate": 0.75,
+        "mean_reward": 0.75
+      }
+    }
+  },
+  "step1_root_cause": {
+    "floating_legacy_delta": {
+      "reset_base_err_xy": 0.0003909748592074417,
+      "reset_base_err_all": 0.009329707565484568,
+      "base_xy_err_mid": 0.012567682242176186,
+      "base_xy_err_end": 0.012713621060053507,
+      "base_xy_err_max": 0.01310947273319319,
+      "arm_err_end": 0.7817418911804755,
+      "arm_mae_end": 0.08516927889379627,
+      "reward": 0.5
+    },
+    "homie_cmd_production": {
+      "reset_base_err_xy": 0.04719989718287252,
+      "reset_base_err_all": 0.04719989718287252,
+      "base_xy_err_mid": 0.06147227078521003,
+      "base_xy_err_end": 0.199327092555662,
+      "base_xy_err_max": 0.2223557854692141,
+      "arm_err_end": 0.7013189680874348,
+      "arm_mae_end": 0.079729141218934,
+      "reward": 0.0
+    },
+    "note": "pelvis/base tracking error of the raw replay, metres; reset_base_err_* is measured before any action is applied."
+  },
+  "step2_success_vs_j": {
+    "floating_hold0": {
+      "2": {
+        "n": 60,
+        "success_rate": 0.4666666666666667,
+        "mean_reward": 0.4666666666666667,
+        "mean_steps": 170.41666666666666,
+        "mean_skeleton_rmse": 0.0904699092109998,
+        "frac_of_j16": 0.6222222222222222
+      },
+      "3": {
+        "n": 60,
+        "success_rate": 0.8166666666666667,
+        "mean_reward": 0.8166666666666667,
+        "mean_steps": 160.33333333333334,
+        "mean_skeleton_rmse": 0.058094596055646736,
+        "frac_of_j16": 1.0888888888888888
+      },
+      "5": {
+        "n": 60,
+        "success_rate": 0.7666666666666667,
+        "mean_reward": 0.7666666666666667,
+        "mean_steps": 163.0,
+        "mean_skeleton_rmse": 0.036696017750849325,
+        "frac_of_j16": 1.0222222222222224
+      },
+      "9": {
+        "n": 60,
+        "success_rate": 0.7333333333333333,
+        "mean_reward": 0.7333333333333333,
+        "mean_steps": 163.5,
+        "mean_skeleton_rmse": 0.02425535873238308,
+        "frac_of_j16": 0.9777777777777777
+      },
+      "16": {
+        "n": 60,
+        "success_rate": 0.75,
+        "mean_reward": 0.75,
+        "mean_steps": 163.65,
+        "mean_skeleton_rmse": 0.0,
+        "frac_of_j16": 1.0
+      }
+    },
+    "homie_production": {
+      "2": {
+        "n": 60,
+        "success_rate": 0.0,
+        "mean_reward": 0.0,
+        "mean_steps": 181.55,
+        "mean_skeleton_rmse": 0.09236047547310591,
+        "frac_of_j16": null
+      },
+      "3": {
+        "n": 60,
+        "success_rate": 0.0,
+        "mean_reward": 0.0,
+        "mean_steps": 181.48333333333332,
+        "mean_skeleton_rmse": 0.05855904314666986,
+        "frac_of_j16": null
+      },
+      "5": {
+        "n": 60,
+        "success_rate": 0.0,
+        "mean_reward": 0.0,
+        "mean_steps": 181.56666666666666,
+        "mean_skeleton_rmse": 0.03683706410229206,
+        "frac_of_j16": null
+      },
+      "9": {
+        "n": 60,
+        "success_rate": 0.0,
+        "mean_reward": 0.0,
+        "mean_steps": 181.56666666666666,
+        "mean_skeleton_rmse": 0.024307118656967455,
+        "frac_of_j16": null
+      },
+      "16": {
+        "n": 60,
+        "success_rate": 0.0,
+        "mean_reward": 0.0,
+        "mean_steps": 181.56666666666666,
+        "mean_skeleton_rmse": 0.0,
+        "frac_of_j16": null
+      }
+    }
+  },
+  "step3_per_chunk_tracking": {
+    "floating_hold0": {
+      "2": {
+        "n_chunks": 426,
+        "mean_ee_final_m": 0.01739757513068029,
+        "p90_ee_final_m": 0.03826969244516562,
+        "mean_ee_max_m": 0.020999169642882305,
+        "p90_ee_max_m": 0.04465538386064946,
+        "mean_joint_final_rad": 0.0784888266506998,
+        "p90_joint_final_rad": 0.1931731531449798,
+        "mean_joint_max_rad": 1.7605988245666069,
+        "p90_joint_max_rad": 6.017047422006726,
+        "mean_skeleton_rmse": 0.06402824755845223,
+        "p90_skeleton_rmse": 0.1765493080019951
+      },
+      "3": {
+        "n_chunks": 426,
+        "mean_ee_final_m": 0.005628008615142741,
+        "p90_ee_final_m": 0.011635485286410927,
+        "mean_ee_max_m": 0.00655525346670615,
+        "p90_ee_max_m": 0.013101083505261414,
+        "mean_joint_final_rad": 0.04225420074726601,
+        "p90_joint_final_rad": 0.09177571399930942,
+        "mean_joint_max_rad": 1.453120176990132,
+        "p90_joint_max_rad": 6.008020521141589,
+        "mean_skeleton_rmse": 0.03454535688954611,
+        "p90_skeleton_rmse": 0.12527545541524887
+      },
+      "5": {
+        "n_chunks": 426,
+        "mean_ee_final_m": 0.00161682948814106,
+        "p90_ee_final_m": 0.0033883062568431854,
+        "mean_ee_max_m": 0.002001159406395025,
+        "p90_ee_max_m": 0.004038816304587367,
+        "mean_joint_final_rad": 0.015710149376464935,
+        "p90_joint_final_rad": 0.03588298986885312,
+        "mean_joint_max_rad": 1.1011471925618717,
+        "p90_joint_max_rad": 5.9777691533381585,
+        "mean_skeleton_rmse": 0.020345521462532504,
+        "p90_skeleton_rmse": 0.07911399006843567
+      },
+      "9": {
+        "n_chunks": 426,
+        "mean_ee_final_m": 0.0006265508815380388,
+        "p90_ee_final_m": 0.0014247882105309511,
+        "mean_ee_max_m": 0.0008868317059810399,
+        "p90_ee_max_m": 0.0019209658298553131,
+        "mean_joint_final_rad": 0.008144143622736038,
+        "p90_joint_final_rad": 0.01176581049648168,
+        "mean_joint_max_rad": 0.7037437072149321,
+        "p90_joint_max_rad": 1.0326192528009415,
+        "mean_skeleton_rmse": 0.012189419970208474,
+        "p90_skeleton_rmse": 0.06455516070127487
+      },
+      "16": {
+        "n_chunks": 426,
+        "mean_ee_final_m": 2.2182952858666087e-07,
+        "p90_ee_final_m": 1.1089995436397084e-14,
+        "mean_ee_max_m": 5.772836406629693e-07,
+        "p90_ee_max_m": 1.8156363623674918e-14,
+        "mean_joint_final_rad": 0.00012792502222241573,
+        "p90_joint_final_rad": 9.800589458760002e-16,
+        "mean_joint_max_rad": 0.007208825861236065,
+        "p90_joint_max_rad": 2.9103830456733704e-11,
+        "mean_skeleton_rmse": 0.0,
+        "p90_skeleton_rmse": 0.0
+      },
+      "by_episode_phase_mean_ee_final_m": {
+        "2": {
+          "early": 0.01744138504473978,
+          "late": 0.007662515166694437,
+          "mid": 0.029198125722753553
+        },
+        "3": {
+          "early": 0.006021535377584242,
+          "late": 0.0026654821839440963,
+          "mid": 0.008806480731083647
+        },
+        "5": {
+          "early": 0.0017939232897416144,
+          "late": 0.0008900133251052115,
+          "mid": 0.0023092093747499793
+        },
+        "9": {
+          "early": 0.0006493221147808377,
+          "late": 0.00039155531284553965,
+          "mid": 0.000887840274024322
+        },
+        "16": {
+          "early": 1.6042005288862698e-07,
+          "late": 3.631037857743636e-07,
+          "mid": 1.1653703416228426e-07
+        }
+      }
+    },
+    "homie_production": {
+      "2": {
+        "n_chunks": 437,
+        "mean_ee_final_m": 0.011138910567819262,
+        "p90_ee_final_m": 0.02441896888013524,
+        "mean_ee_max_m": 0.014478380148140103,
+        "p90_ee_max_m": 0.02984072435046197,
+        "mean_joint_final_rad": 0.06622228610132902,
+        "p90_joint_final_rad": 0.13454544548374803,
+        "mean_joint_max_rad": 1.7642448621864824,
+        "p90_joint_max_rad": 6.266452155658047,
+        "mean_skeleton_rmse": 0.06550130930303409,
+        "p90_skeleton_rmse": 0.17678795456886293
+      },
+      "3": {
+        "n_chunks": 437,
+        "mean_ee_final_m": 0.004173919082168454,
+        "p90_ee_final_m": 0.008128891783967139,
+        "mean_ee_max_m": 0.0049407702731386885,
+        "p90_ee_max_m": 0.009587412420230814,
+        "mean_joint_final_rad": 0.03435824622952965,
+        "p90_joint_final_rad": 0.0705565588791615,
+        "mean_joint_max_rad": 1.4492917332041184,
+        "p90_joint_max_rad": 6.047484954399988,
+        "mean_skeleton_rmse": 0.03477815467029551,
+        "p90_skeleton_rmse": 0.12520112097263336
+      },
+      "5": {
+        "n_chunks": 437,
+        "mean_ee_final_m": 0.0013398045354805546,
+        "p90_ee_final_m": 0.0024268120380183753,
+        "mean_ee_max_m": 0.0015948465689265834,
+        "p90_ee_max_m": 0.0028337068659216266,
+        "mean_joint_final_rad": 0.016014473007591387,
+        "p90_joint_final_rad": 0.03133407567572789,
+        "mean_joint_max_rad": 1.0633011168864612,
+        "p90_joint_max_rad": 4.322762223822068,
+        "mean_skeleton_rmse": 0.02026708237218284,
+        "p90_skeleton_rmse": 0.0791121318936348
+      },
+      "9": {
+        "n_chunks": 437,
+        "mean_ee_final_m": 0.0005452507739276004,
+        "p90_ee_final_m": 0.001291932446421638,
+        "mean_ee_max_m": 0.0007137466414498417,
+        "p90_ee_max_m": 0.0015032644165395301,
+        "mean_joint_final_rad": 0.008479136305441542,
+        "p90_joint_final_rad": 0.014735132199391423,
+        "mean_joint_max_rad": 0.6775297847981961,
+        "p90_joint_max_rad": 1.161045289039612,
+        "mean_skeleton_rmse": 0.012080586167648767,
+        "p90_skeleton_rmse": 0.0645547404885292
+      },
+      "16": {
+        "n_chunks": 437,
+        "mean_ee_final_m": 2.1562886864451817e-06,
+        "p90_ee_final_m": 8.47392548825945e-09,
+        "mean_ee_max_m": 2.247704911811628e-06,
+        "p90_ee_max_m": 8.598852573858028e-09,
+        "mean_joint_final_rad": 0.00010380827372180029,
+        "p90_joint_final_rad": 0.00021041328060352534,
+        "mean_joint_max_rad": 0.0065300927741998634,
+        "p90_joint_max_rad": 0.007829105062410236,
+        "mean_skeleton_rmse": 0.0,
+        "p90_skeleton_rmse": 0.0
+      },
+      "by_episode_phase_mean_ee_final_m": {
+        "2": {
+          "early": 0.013021695423136337,
+          "late": 0.004262376033432675,
+          "mid": 0.017209721406715565
+        },
+        "3": {
+          "early": 0.005200742030709218,
+          "late": 0.0019047417227941834,
+          "mid": 0.005738401882487291
+        },
+        "5": {
+          "early": 0.001644129571050895,
+          "late": 0.0006925215514952882,
+          "mid": 0.0017737118587042328
+        },
+        "9": {
+          "early": 0.0005508614764415175,
+          "late": 0.00039038054118088414,
+          "mid": 0.0007217876762370271
+        },
+        "16": {
+          "early": 7.614718357551227e-09,
+          "late": 4.804558425178083e-06,
+          "mid": 1.3587596316161373e-06
+        }
+      }
+    }
+  },
+  "step3_restore_verification": {
+    "channelwise": {
+      "floating": {
+        "era": "floating",
+        "n_demos": 15,
+        "n_chunks": 170,
+        "max_qpos": 0.0005042335290872391,
+        "max_qvel": 0.15552950012700284,
+        "max_hand_m": 3.4088785585417725e-05,
+        "frac_chunks_exact": 0.19411764705882353,
+        "robot_nq": 29
+      },
+      "homie": {
+        "era": "homie",
+        "n_demos": 8,
+        "n_chunks": 95,
+        "max_qpos": 0.014938510700598817,
+        "max_qvel": 1.7664454984628535,
+        "max_hand_m": 5.743006976782761e-05,
+        "frac_chunks_exact": 0.2,
+        "robot_nq": 41,
+        "nq_full": 48,
+        "qpos_argmax_hist": {
+          "0": 19,
+          "4": 4,
+          "7": 7,
+          "8": 2,
+          "9": 3,
+          "12": 13,
+          "13": 3,
+          "14": 10,
+          "20": 1,
+          "22": 7,
+          "23": 9,
+          "26": 4,
+          "27": 7,
+          "44": 1,
+          "45": 4,
+          "46": 1
+        }
+      }
+    },
+    "note": "j=16 in chunk mode replays the reference actions after a restore, so its deviation IS the restore error. The channelwise probe (restore_check.py) additionally splits full-model qpos / qvel / hand position."
+  },
+  "step4a_zero_order_hold": {
+    "2": {
+      "n": 60,
+      "success_rate": 0.11666666666666667,
+      "mean_skeleton_rmse": 0.18044215502838293
+    },
+    "3": {
+      "n": 60,
+      "success_rate": 0.5833333333333334,
+      "mean_skeleton_rmse": 0.1072675603752335
+    },
+    "5": {
+      "n": 60,
+      "success_rate": 0.8166666666666667,
+      "mean_skeleton_rmse": 0.06300420292342702
+    },
+    "9": {
+      "n": 60,
+      "success_rate": 0.7166666666666667,
+      "mean_skeleton_rmse": 0.028204704937525093
+    },
+    "16": {
+      "n": 60,
+      "success_rate": 0.75,
+      "mean_skeleton_rmse": 0.0
+    }
+  },
+  "step4b_knot_perturbation": {
+    "j3_fine_bin_plus": {
+      "n": 60,
+      "success_rate": 0.03333333333333333,
+      "knot": null,
+      "quantum": null
+    },
+    "j3_fine_bin_minus": {
+      "n": 60,
+      "success_rate": 0.55,
+      "knot": null,
+      "quantum": null
+    },
+    "j3_fine_bin_rand": {
+      "n": 60,
+      "success_rate": 0.7,
+      "knot": null,
+      "quantum": null
+    },
+    "j3_window_plus": {
+      "n": 60,
+      "success_rate": 0.0,
+      "knot": null,
+      "quantum": null
+    },
+    "j3_window_minus": {
+      "n": 60,
+      "success_rate": 0.0,
+      "knot": null,
+      "quantum": null
+    },
+    "j3_window_rand": {
+      "n": 60,
+      "success_rate": 0.08333333333333333,
+      "knot": null,
+      "quantum": null
+    },
+    "j5_fine_bin_plus": {
+      "n": 60,
+      "success_rate": 0.03333333333333333,
+      "knot": null,
+      "quantum": null
+    },
+    "j5_fine_bin_minus": {
+      "n": 60,
+      "success_rate": 0.8666666666666667,
+      "knot": null,
+      "quantum": null
+    },
+    "j5_fine_bin_rand": {
+      "n": 60,
+      "success_rate": 0.7333333333333333,
+      "knot": null,
+      "quantum": null
+    },
+    "j5_window_plus": {
+      "n": 60,
+      "success_rate": 0.0,
+      "knot": null,
+      "quantum": null
+    },
+    "j5_window_minus": {
+      "n": 60,
+      "success_rate": 0.0,
+      "knot": null,
+      "quantum": null
+    },
+    "j5_window_rand": {
+      "n": 60,
+      "success_rate": 0.23333333333333334,
+      "knot": null,
+      "quantum": null
+    }
+  },
+  "step4b_quanta": {
+    "fine_bin": 0.016,
+    "window": 0.15,
+    "note": "fine_bin = finest CQN-AS bin over [-1, 1] with levels=3, bins=5 (runs/A/.hydra/config.yaml); window = ZoomQ round-1 residual window half-width."
+  }
+}
