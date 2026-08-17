@@ -1,0 +1,134 @@
+[
+  {
+    "run": "p7_mp_zqA_s1",
+    "snapshot": "snapshot_2100.pt",
+    "exec_cond_skeleton": false,
+    "exec_head_in": 1024,
+    "n_states": 16,
+    "sensitivity_atoms": 0.08167745181708597,
+    "depth_spread_atoms": 0.015908329078229144,
+    "demo_vs_random_auc": 0.5546875,
+    "verdict": "inert (Q^exec barely moves with the action; depth spread under one C51 atom: the rule cannot fire; cannot rank a demo above a random chunk)"
+  },
+  {
+    "run": "p7_mp_zqA_s2",
+    "snapshot": "snapshot_2100.pt",
+    "exec_cond_skeleton": false,
+    "exec_head_in": 1024,
+    "n_states": 16,
+    "sensitivity_atoms": 0.12757389558828436,
+    "depth_spread_atoms": 0.03696182247949764,
+    "demo_vs_random_auc": 0.5234375,
+    "verdict": "inert (Q^exec barely moves with the action; depth spread under one C51 atom: the rule cannot fire; cannot rank a demo above a random chunk)"
+  },
+  {
+    "run": "p7_mp_zqA_s3",
+    "snapshot": "snapshot_2100.pt",
+    "exec_cond_skeleton": false,
+    "exec_head_in": 1024,
+    "n_states": 16,
+    "sensitivity_atoms": 0.1526607826235704,
+    "depth_spread_atoms": 0.024143343762261793,
+    "demo_vs_random_auc": 0.7734375,
+    "verdict": "inert (Q^exec barely moves with the action; depth spread under one C51 atom: the rule cannot fire)"
+  },
+  {
+    "run": "p7_mp_zqA_s4",
+    "snapshot": "snapshot_2100.pt",
+    "exec_cond_skeleton": false,
+    "exec_head_in": 1024,
+    "n_states": 16,
+    "sensitivity_atoms": 0.09788924944587052,
+    "depth_spread_atoms": 0.03315322392154485,
+    "demo_vs_random_auc": 0.6171875,
+    "verdict": "inert (Q^exec barely moves with the action; depth spread under one C51 atom: the rule cannot fire)"
+  },
+  {
+    "run": "p7_mp_zqSF_s1",
+    "snapshot": "snapshot_2100.pt",
+    "exec_cond_skeleton": true,
+    "exec_head_in": 1264,
+    "n_states": 16,
+    "sensitivity_atoms": 0.022740476288163336,
+    "depth_spread_atoms": 0.0016851624877745053,
+    "demo_vs_random_auc": 0.2421875,
+    "verdict": "inert (Q^exec barely moves with the action; depth spread under one C51 atom: the rule cannot fire; cannot rank a demo above a random chunk)"
+  },
+  {
+    "run": "p7_mp_zqSF_s2",
+    "snapshot": "snapshot_2100.pt",
+    "exec_cond_skeleton": true,
+    "exec_head_in": 1264,
+    "n_states": 16,
+    "sensitivity_atoms": 0.02147360291928635,
+    "depth_spread_atoms": 0.0007647751772310585,
+    "demo_vs_random_auc": 0.0078125,
+    "verdict": "inert (Q^exec barely moves with the action; depth spread under one C51 atom: the rule cannot fire; cannot rank a demo above a random chunk)"
+  },
+  {
+    "run": "p7_mp_zqSF_s3",
+    "snapshot": "snapshot_2100.pt",
+    "exec_cond_skeleton": true,
+    "exec_head_in": 1264,
+    "n_states": 16,
+    "sensitivity_atoms": 0.018951541460410226,
+    "depth_spread_atoms": 0.0018539061784395017,
+    "demo_vs_random_auc": 0.265625,
+    "verdict": "inert (Q^exec barely moves with the action; depth spread under one C51 atom: the rule cannot fire; cannot rank a demo above a random chunk)"
+  },
+  {
+    "run": "p7_mp_zqSF_s4",
+    "snapshot": "snapshot_2100.pt",
+    "exec_cond_skeleton": true,
+    "exec_head_in": 1264,
+    "n_states": 16,
+    "sensitivity_atoms": 0.02628715283208294,
+    "depth_spread_atoms": 0.0006659013706666883,
+    "demo_vs_random_auc": 0.03125,
+    "verdict": "inert (Q^exec barely moves with the action; depth spread under one C51 atom: the rule cannot fire; cannot rank a demo above a random chunk)"
+  },
+  {
+    "run": "p7_mp_zqS_s1",
+    "snapshot": "snapshot_2100.pt",
+    "exec_cond_skeleton": true,
+    "exec_head_in": 1264,
+    "n_states": 16,
+    "sensitivity_atoms": 0.5552535782044288,
+    "depth_spread_atoms": 0.011068855746998452,
+    "demo_vs_random_auc": 0.3046875,
+    "verdict": "inert (Q^exec barely moves with the action; depth spread under one C51 atom: the rule cannot fire; cannot rank a demo above a random chunk)"
+  },
+  {
+    "run": "p7_mp_zqS_s2",
+    "snapshot": "snapshot_2100.pt",
+    "exec_cond_skeleton": true,
+    "exec_head_in": 1264,
+    "n_states": 16,
+    "sensitivity_atoms": 1.8587679194752127,
+    "depth_spread_atoms": 0.02893692289944738,
+    "demo_vs_random_auc": 0.2265625,
+    "verdict": "inert (depth spread under one C51 atom: the rule cannot fire; cannot rank a demo above a random chunk)"
+  },
+  {
+    "run": "p7_mp_zqS_s3",
+    "snapshot": "snapshot_2100.pt",
+    "exec_cond_skeleton": true,
+    "exec_head_in": 1264,
+    "n_states": 16,
+    "sensitivity_atoms": 0.457709366310155,
+    "depth_spread_atoms": 0.02183471733587794,
+    "demo_vs_random_auc": 0.4140625,
+    "verdict": "inert (Q^exec barely moves with the action; depth spread under one C51 atom: the rule cannot fire; cannot rank a demo above a random chunk)"
+  },
+  {
+    "run": "p7_mp_zqS_s4",
+    "snapshot": "snapshot_2100.pt",
+    "exec_cond_skeleton": true,
+    "exec_head_in": 1264,
+    "n_states": 16,
+    "sensitivity_atoms": 0.8461698147584684,
+    "depth_spread_atoms": 0.009075500929611735,
+    "demo_vs_random_auc": 0.1171875,
+    "verdict": "inert (Q^exec barely moves with the action; depth spread under one C51 atom: the rule cannot fire; cannot rank a demo above a random chunk)"
+  }
+]

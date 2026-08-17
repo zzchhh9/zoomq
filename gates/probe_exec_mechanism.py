@@ -109,7 +109,7 @@ def probe(run, n_states=24, seed=0):
     demos = demo_chunks(run_dir, T, D, n_want=n_states)
     have_demos = demos is not None and len(demos) >= n_states
 
-    sens, spread, aucs = [], [], []
+    sens, sens0, spread, aucs = [], [], [], []
     with torch.no_grad():
         for i in range(n_states):
             rgb, low = rgbs[i], lows[i]
@@ -127,7 +127,16 @@ def probe(run, n_states=24, seed=0):
                 [(cr.forward_zoomq(rgb, low, a)["exec_probs"] * sup).sum(-1)[0]
                  for a in cand]
             )  # [6, R]
-            sens.append((qs.max(0).values - qs.min(0).values).max().item())
+            # Per-round, then reported BOTH ways. Taking only the max over rounds
+            # -- which this probe originally did -- hides the one round that
+            # matters: eval executes ROUND 0 essentially always (the stopping rule
+            # never fires), and under the shipped config dQ^exec_0/d(action) is
+            # EXACTLY zero while rounds 1-4 do have a gradient. So a max-over-rounds
+            # number rises with training on an arm whose round-0 head is still
+            # structurally blind, and reads as a fix that is not there.
+            per_round = (qs.max(0).values - qs.min(0).values)  # [R]
+            sens.append(per_round.max().item())
+            sens0.append(per_round[0].item())
 
             # 2. across-depth spread, on a plausible (demo) chunk when available
             base = torch.as_tensor(demos[i])[None] if have_demos else cand[3]
@@ -151,6 +160,7 @@ def probe(run, n_states=24, seed=0):
         "exec_head_in": int(net.exec_head[0].in_features),
         "n_states": n_states,
         "sensitivity_atoms": float(np.mean(sens) / DZ),
+        "sensitivity_round0_atoms": float(np.mean(sens0) / DZ),
         "depth_spread_atoms": float(np.mean(spread) / DZ),
         "demo_vs_random_auc": float(np.mean(aucs)) if aucs else None,
     }
@@ -163,8 +173,14 @@ def verdict(r):
     if r.get("sensitivity_atoms") is None:
         return "no data"
     fails = []
-    if r["sensitivity_atoms"] <= 1.0:
-        fails.append("Q^exec barely moves with the action")
+    # ROUND 0 is the gate that matters: it is the depth eval executes essentially
+    # always, and it is the one the shipped conditioning leaves with an exactly
+    # zero action-gradient. A healthy max-over-rounds number next to a dead round-0
+    # number means rounds 1-4 carry all the sensitivity and the executed skeleton
+    # is still unscored.
+    if r["sensitivity_round0_atoms"] <= 1.0:
+        fails.append("round-0 Q^exec barely moves with the action "
+                     "(the depth eval actually executes)")
     if r["depth_spread_atoms"] <= 1.0:
         # Below one atom the C51-spread u_r floor makes the rule unfireable at ANY
         # kappa, so this is the binding one.
@@ -196,20 +212,24 @@ def main():
 
     torch.set_num_threads(4)
     out = []
-    print(f"{'run':<18} {'skel':>5} {'in':>5} {'sens':>7} {'depth':>7} {'AUC':>6}  verdict")
-    print(f"{'':<18} {'':>5} {'':>5} {'atoms':>7} {'atoms':>7} {'':>6}")
-    print("-" * 92)
+    print(f"{'run':<18} {'skel':>5} {'sens_r0':>8} {'sens_max':>9} {'depth':>7} {'AUC':>6}  verdict")
+    print(f"{'':<18} {'':>5} {'atoms':>8} {'atoms':>9} {'atoms':>7} {'':>6}")
+    print("-" * 104)
     for run in runs:
         r = probe(run, n_states=args.states)
         out.append(r)
         if "error" in r:
-            print(f"{run:<18} {'-':>5} {'-':>5} {'-':>7} {'-':>7} {'-':>6}  {r['error']}")
+            print(f"{run:<18} {'-':>5} {'-':>8} {'-':>9} {'-':>7} {'-':>6}  {r['error']}")
             continue
         auc = "-" if r["demo_vs_random_auc"] is None else f"{r['demo_vs_random_auc']:.3f}"
-        print(f"{run:<18} {str(r['exec_cond_skeleton']):>5} {r['exec_head_in']:>5} "
-              f"{r['sensitivity_atoms']:>7.3f} {r['depth_spread_atoms']:>7.3f} "
-              f"{auc:>6}  {r['verdict']}")
+        print(f"{run:<18} {str(r['exec_cond_skeleton']):>5} "
+              f"{r['sensitivity_round0_atoms']:>8.3f} {r['sensitivity_atoms']:>9.3f} "
+              f"{r['depth_spread_atoms']:>7.3f} {auc:>6}  {r['verdict']}")
 
+    print("\nsens_r0 is the load-bearing one: round 0 is what eval executes, and the")
+    print("shipped conditioning leaves its action-gradient EXACTLY zero while rounds")
+    print("1-4 do have one -- so sens_max can rise with training on an arm whose")
+    print("executed skeleton is still unscored.")
     print("\nthresholds: sensitivity > 1 atom (shipped 0.064, per-cell head 3.039,")
     print("            CQN-AS baseline 7.218) | depth spread > 1 atom (shipped 0.015;")
     print("            below one atom the u_r floor makes the rule unfireable at any")
