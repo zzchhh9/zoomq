@@ -1,0 +1,23 @@
+=== FREQ SWEEP Sun Aug 16 12:43:53 BST 2026 ===
+[move_plate] dsr= 5 (100 Hz, 10.0 ms/step) success=0.867 (52/60)  clip=0.000  [24s]
+[move_plate] dsr= 8 ( 62 Hz, 16.0 ms/step) success=0.750 (45/60)  clip=0.000  [24s]
+[move_plate] dsr=10 ( 50 Hz, 20.0 ms/step) success=0.750 (45/60)  clip=0.000  [38s]
+[move_plate] dsr=12 ( 41 Hz, 24.0 ms/step) success=0.650 (39/60)  clip=0.000  [32s]
+[move_plate] dsr=15 ( 33 Hz, 30.0 ms/step) success=0.700 (42/60)  clip=0.000  [22s]
+[move_plate] dsr=20 ( 25 Hz, 40.0 ms/step) success=0.617 (37/60)  clip=0.000  [26s]
+[move_plate] dsr=25 ( 20 Hz, 50.0 ms/step) success=0.583 (35/60)  clip=0.000  [24s]
+[drawer_top_close] dsr= 5 (100 Hz, 10.0 ms/step) success=1.000 (51/51)  clip=0.097  [22s]
+[drawer_top_close] dsr= 8 ( 62 Hz, 16.0 ms/step) success=1.000 (51/51)  clip=0.097  [21s]
+[drawer_top_close] dsr=10 ( 50 Hz, 20.0 ms/step) success=1.000 (51/51)  clip=0.097  [22s]
+[drawer_top_close] dsr=12 ( 41 Hz, 24.0 ms/step) success=1.000 (51/51)  clip=0.097  [21s]
+[drawer_top_close] dsr=15 ( 33 Hz, 30.0 ms/step) success=1.000 (51/51)  clip=0.098  [21s]
+[drawer_top_close] dsr=20 ( 25 Hz, 40.0 ms/step) success=1.000 (51/51)  clip=0.098  [20s]
+[drawer_top_close] dsr=25 ( 20 Hz, 50.0 ms/step) success=1.000 (51/51)  clip=0.099  [20s]
+wrote /mnt/workspace/zoomq/gates/gate1_frequency_sweep.json
+=== VERDICTS Sun Aug 16 12:49:29 BST 2026 ===
+[move_plate] dsr=10
+  n=60 success=45 rate=0.750 drop=0.250
+[drawer_top_close] dsr=10
+  n=51 success=51 rate=1.000 drop=0.000
+wrote /mnt/workspace/zoomq/gates/replay_verdicts.json
+=== DONE Sun Aug 16 12:50:13 BST 2026 ===

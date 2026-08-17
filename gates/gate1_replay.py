@@ -92,6 +92,13 @@ TASK_CONFIG = {
                          "episode_length": 3000, "n_demos": 60},
     "drawer_top_close": {"enable_all_floating_dof": True,
                          "episode_length": 3000, "n_demos": 51},
+    # Phase 2 primary band. episode_length and enable_all_floating_dof copied
+    # from cfgs/bigym_task/<task>.yaml -- they select the demo directory, so a
+    # mismatch silently returns a different demo family.
+    "take_cups":        {"enable_all_floating_dof": True,
+                         "episode_length": 10500, "n_demos": 36},
+    "put_cups":         {"enable_all_floating_dof": True,
+                         "episode_length": 8500, "n_demos": 56},
 }
 
 # CQN-AS quantisation actually used by the live runs (.hydra/config.yaml:
@@ -140,34 +147,45 @@ def _cumulative(chunk_len: int) -> list[list[int]]:
     return out
 
 
-def project(chunk: np.ndarray, knots: list[int], kind: str = "linear") -> np.ndarray:
+def project(chunk: np.ndarray, knots: list[int], kind: str = "linear",
+            hold_dims: tuple = ()) -> np.ndarray:
     """Keep the actions at ``knots``; fill the rest.
 
     ``linear``: linear interpolation between neighbouring knots.
     ``zoh``   : zero-order hold (the previous knot's value).
+
+    ``hold_dims`` overrides ``kind`` for those dims only, giving them the
+    zero-order hold.  This mirrors ``bigym_src/zoomq.py::_fill``, which returns
+    ``lo`` (the left knot) for every dim listed in ``zoomq.hold_dims`` and the
+    linear blend for the rest -- so a replay under ``hold_dims`` executes
+    exactly the chunks a ZoomQ arm configured that way would execute.
     """
     m = chunk.shape[0]
     ks = sorted({0, m - 1} | {k for k in knots if k < m})
     out = np.empty_like(chunk)
     grid = np.arange(m, dtype=np.float64)
+    ka = np.asarray(ks)
+    zidx = np.searchsorted(ks, grid, side="right") - 1
     for d in range(chunk.shape[1]):
-        if kind == "linear":
+        if d in hold_dims:
+            out[:, d] = chunk[ka[zidx], d]
+        elif kind == "linear":
             out[:, d] = np.interp(grid, ks, chunk[ks, d])
         elif kind == "zoh":
-            idx = np.searchsorted(ks, grid, side="right") - 1
-            out[:, d] = chunk[np.asarray(ks)[idx], d]
+            out[:, d] = chunk[ka[zidx], d]
         else:
             raise ValueError(kind)
     return out
 
 
 def project_sequence(actions: np.ndarray, j: int, kind: str = "linear",
-                     chunk_len: int = CHUNK_LEN) -> np.ndarray:
+                     chunk_len: int = CHUNK_LEN, hold_dims: tuple = ()) -> np.ndarray:
     """Project a whole action sequence, chunk by chunk (non-overlapping)."""
     knots = knots_for_j(j, chunk_len)
     out = np.empty_like(actions)
     for s in range(0, len(actions), chunk_len):
-        out[s:s + chunk_len] = project(actions[s:s + chunk_len], knots, kind)
+        out[s:s + chunk_len] = project(actions[s:s + chunk_len], knots, kind,
+                                       hold_dims)
     return out
 
 
@@ -442,7 +460,8 @@ def mode_full(env, demos, args, kind="linear"):
     for j in args.j:
         rows = []
         for d in demos:
-            acts = project_sequence(d["actions"], j, kind, args.chunk_len)
+            acts = project_sequence(d["actions"], j, kind, args.chunk_len,
+                                    tuple(getattr(args, "hold_dims", ()) or ()))
             r = rollout(env, np.clip(acts, -1, 1), d["seed"])
             r["skeleton_rmse"] = float(np.sqrt(np.mean(
                 (acts - d["actions"]) ** 2)))
@@ -722,6 +741,13 @@ def main():
     p.add_argument("--j", type=str, default="2,3,5,9,16",
                    help="comma-separated dyadic knot counts")
     p.add_argument("--chunk-len", type=int, default=CHUNK_LEN)
+    p.add_argument("--hold-dims", type=str, default="",
+                   help="comma-separated action dims that get a ZERO-ORDER "
+                        "HOLD instead of the linear fill, mirroring "
+                        "zoomq.hold_dims. The binary gripper dims are 13 for "
+                        "move_plate (D=15) and 14,15 for the D=16 tasks; a "
+                        "linear fill there commands a half-closed gripper the "
+                        "demonstrations never contain.")
     p.add_argument("--workers", type=int, default=6,
                    help="parallel worker processes (each builds its own env)")
     p.add_argument("--untrimmed", action="store_true", default=True,
@@ -736,6 +762,7 @@ def main():
     p.add_argument("--out", type=str, default=None, help="write JSON here")
     args = p.parse_args()
     args.j = [int(x) for x in str(args.j).split(",") if x]
+    args.hold_dims = tuple(int(x) for x in str(args.hold_dims).split(",") if x.strip())
 
     t0 = time.time()
     n = int(args.num_demos)
