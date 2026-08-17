@@ -33,16 +33,29 @@ INTERVAL="${INTERVAL:-300}"
 MIN_FREE_GB="${MIN_FREE_GB:-150}"
 export DEMO_HOME=/mnt/workspace/zoomq/demos
 
-# Arms deliberately stopped (scripts/cull.sh). Resuming them would undo the cull.
-CULLED=" p3_mp_zqH_s1 p3_mp_zqH_s2 p3_tc_zqH_s1 p3_tc_zqH_s2 p3_pc_zqH_s1 p3_pc_zqH_s2 p4_tc_zqX_s1 p4_pc_zqX_s1 p2_du_base_s1 p2_du_base_s2 p2_du_zqA_s1 p2_du_zqA_s2 p2_du_zqF_s1 p2_du_zqF_s2 "
+# WHITELIST, not a blacklist. The previous version carried a CULLED blacklist and
+# had to be edited after every cull; it was not, so it resurrected 27 arms that a
+# later cull had deliberately stopped. The set of arms that SHOULD be running is
+# small and stable, so name that instead: anything not listed here stays down, and
+# a future cull needs no edit at all.
+#
+# These twelve are the CQN-AS baselines that reproduce the published numbers
+# (move_plate 0.80/0.68/0.68 at 50K vs 64.0 +- 7.5; saucepan 0.92 at 30K vs
+# 80.5 +- 13.3). Every ZoomQ arm is deliberately down: they all use the
+# action-blind exec head, so more frames only re-confirm the same inert mechanism
+# (see .claude/plans/cryptic-fluttering-treehouse.md). Their snapshots are intact,
+# so any of them resumes by being added here.
+KEEP=" p1_mp_s1 p1_mp_s2 p1_mp_s3 p1_sh_s1 p1_sh_s2 p1_sh_s3 p2_tc_base_s1 p2_tc_base_s2 p2_pc_base_s1 p2_pc_base_s2 p2_fc_base_s1 p2_fc_base_s2 "
 
 while true; do
   for d in runs/p1_* runs/p2_* runs/p3_* runs/p4_* runs/p5_* runs/p6_*; do
     [ -d "$d" ] || continue
     a=$(basename "$d")
-    # Alive? The run dir path appears in the trainer's own command line.
-    if ps -eo args | grep -q "[/]runs/$a"; then continue; fi
-    case "$CULLED" in *" $a "*) continue ;; esac
+    case "$KEEP" in *" $a "*) ;; *) continue ;; esac
+    # Alive? Match the TRAINER's own command line. A bare "/runs/$a" also matches
+    # the eval daemons' `--path .../runs/$a` argument, which made dead arms look
+    # alive during the OOM episode.
+    if pgrep -f "train_cqn_as_bigym.*runs/${a}\b" >/dev/null 2>&1; then continue; fi
     free_gb=$(free -g | awk '/^Mem:/ {print $7}')
     if [ "${free_gb:-0}" -lt "$MIN_FREE_GB" ]; then
       echo "$(date -Is) $a is down but only ${free_gb} GB available (need ${MIN_FREE_GB}); NOT restarting"
