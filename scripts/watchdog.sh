@@ -18,18 +18,36 @@
 # It reconstructs each arm's launch from `.hydra/hydra.yaml` (the overrides the
 # arm was actually started with) rather than from a hardcoded table, so it stays
 # correct as new waves are added.
+#
+# MEMORY GATE. The first version of this script had two bugs that together made
+# an OOM episode worse: it scanned only p1..p4, so the phase-5/6 arms were never
+# covered; and it restarted arms unconditionally, including into a box that was
+# already out of RAM. Measured PSS per arm is 17.9 GB below 5K frames and 33.0 GB
+# above 40K, so a restart costs ~18 GB immediately and grows from there. It now
+# refuses to restart anything unless MIN_FREE_GB is available, and it never
+# restarts an arm on the CULL list.
 set -uo pipefail
 
 cd /mnt/workspace/zoomq
 INTERVAL="${INTERVAL:-300}"
+MIN_FREE_GB="${MIN_FREE_GB:-150}"
 export DEMO_HOME=/mnt/workspace/zoomq/demos
 
+# Arms deliberately stopped (scripts/cull.sh). Resuming them would undo the cull.
+CULLED=" p3_mp_zqH_s1 p3_mp_zqH_s2 p3_tc_zqH_s1 p3_tc_zqH_s2 p3_pc_zqH_s1 p3_pc_zqH_s2 p4_tc_zqX_s1 p4_pc_zqX_s1 p2_du_base_s1 p2_du_base_s2 p2_du_zqA_s1 p2_du_zqA_s2 p2_du_zqF_s1 p2_du_zqF_s2 "
+
 while true; do
-  for d in runs/p1_* runs/p2_* runs/p3_* runs/p4_*; do
+  for d in runs/p1_* runs/p2_* runs/p3_* runs/p4_* runs/p5_* runs/p6_*; do
     [ -d "$d" ] || continue
     a=$(basename "$d")
     # Alive? The run dir path appears in the trainer's own command line.
     if ps -eo args | grep -q "[/]runs/$a"; then continue; fi
+    case "$CULLED" in *" $a "*) continue ;; esac
+    free_gb=$(free -g | awk '/^Mem:/ {print $7}')
+    if [ "${free_gb:-0}" -lt "$MIN_FREE_GB" ]; then
+      echo "$(date -Is) $a is down but only ${free_gb} GB available (need ${MIN_FREE_GB}); NOT restarting"
+      continue
+    fi
     # Never resume something that never started (no snapshot to resume from).
     [ -f "$d/snapshot.pt" ] || { echo "$(date -Is) $a: no snapshot.pt, skipping"; continue; }
 
