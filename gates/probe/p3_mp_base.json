@@ -1,0 +1,69 @@
+{
+  "tag": "mp_base",
+  "is_zoomq": false,
+  "delta_z": 0.07999837398529053,
+  "num_states": 256,
+  "levels": 3,
+  "groups": {
+    "knots_t0_t15": {
+      "L0": {
+        "binspread": 0.8488851189613342,
+        "binspread_dz": 10.611279663226911,
+        "tie_frac": 0.0,
+        "p10_dz": 6.385631114256976,
+        "p90_dz": 16.479873337555414,
+        "argmax_bin0_frac": 0.09752604166666666
+      },
+      "L1": {
+        "binspread": 0.7273645997047424,
+        "binspread_dz": 9.09224229780576,
+        "tie_frac": 0.0,
+        "p10_dz": 5.075787169839437,
+        "p90_dz": 14.838163543568156,
+        "argmax_bin0_frac": 0.22799479166666667
+      },
+      "L2": {
+        "binspread": 0.34978002309799194,
+        "binspread_dz": 4.372339157322207,
+        "tie_frac": 0.0,
+        "p10_dz": 1.1705169504153787,
+        "p90_dz": 8.47237045039675,
+        "argmax_bin0_frac": 0.23216145833333332
+      },
+      "cellq_std_across_cells_dz": 2.2351486682891846,
+      "cellq_std_across_states_dz": 1.6193665015087733,
+      "demo_minus_shift_dz": 1.003106489587602,
+      "demo_minus_shift_win": 0.95703125
+    },
+    "all_cells": {
+      "L0": {
+        "binspread": 0.7326505184173584,
+        "binspread_dz": 9.158317624706628,
+        "tie_frac": 0.0,
+        "p10_dz": 5.995977685057557,
+        "p90_dz": 12.311936221733784,
+        "argmax_bin0_frac": 0.09825846354166666
+      },
+      "L1": {
+        "binspread": 0.6228660345077515,
+        "binspread_dz": 7.785983682896845,
+        "tie_frac": 0.0,
+        "p10_dz": 4.858192713184071,
+        "p90_dz": 10.640362254591514,
+        "argmax_bin0_frac": 0.22705078125
+      },
+      "L2": {
+        "binspread": 0.40571242570877075,
+        "binspread_dz": 5.071508400700369,
+        "tie_frac": 0.0,
+        "p10_dz": 1.862992176731364,
+        "p90_dz": 9.138447565473308,
+        "argmax_bin0_frac": 0.22386067708333332
+      },
+      "cellq_std_across_cells_dz": 2.06649112701416,
+      "cellq_std_across_states_dz": 2.007146742167418,
+      "demo_minus_shift_dz": 1.209422754535633,
+      "demo_minus_shift_win": 0.984375
+    }
+  }
+}

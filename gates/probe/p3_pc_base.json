@@ -1,0 +1,69 @@
+{
+  "tag": "pc_base",
+  "is_zoomq": false,
+  "delta_z": 0.07999837398529053,
+  "num_states": 256,
+  "levels": 3,
+  "groups": {
+    "knots_t0_t15": {
+      "L0": {
+        "binspread": 0.5635842084884644,
+        "binspread_dz": 7.044945795924449,
+        "tie_frac": 0.0,
+        "p10_dz": 3.9926363670230605,
+        "p90_dz": 11.99497612040383,
+        "argmax_bin0_frac": 0.136474609375
+      },
+      "L1": {
+        "binspread": 0.5663722157478333,
+        "binspread_dz": 7.07979659501546,
+        "tie_frac": 0.0,
+        "p10_dz": 3.72653239205752,
+        "p90_dz": 11.388011697649295,
+        "argmax_bin0_frac": 0.22705078125
+      },
+      "L2": {
+        "binspread": 0.29770058393478394,
+        "binspread_dz": 3.7213329359609584,
+        "tie_frac": 0.006103515625,
+        "p10_dz": 0.016566251705519133,
+        "p90_dz": 7.413215363409456,
+        "argmax_bin0_frac": 0.2479248046875
+      },
+      "cellq_std_across_cells_dz": 2.1196603775024414,
+      "cellq_std_across_states_dz": 0.48254321424579966,
+      "demo_minus_shift_dz": 0.9146364974108706,
+      "demo_minus_shift_win": 0.9921875
+    },
+    "all_cells": {
+      "L0": {
+        "binspread": 0.580661416053772,
+        "binspread_dz": 7.258415229296278,
+        "tie_frac": 0.0,
+        "p10_dz": 4.429456841634691,
+        "p90_dz": 12.381579555191298,
+        "argmax_bin0_frac": 0.1342926025390625
+      },
+      "L1": {
+        "binspread": 0.5239623785018921,
+        "binspread_dz": 6.549662854375442,
+        "tie_frac": 0.0,
+        "p10_dz": 3.720947360578177,
+        "p90_dz": 10.522142457996498,
+        "argmax_bin0_frac": 0.22637939453125
+      },
+      "L2": {
+        "binspread": 0.3147621154785156,
+        "binspread_dz": 3.9346064150802817,
+        "tie_frac": 0.0070648193359375,
+        "p10_dz": 0.015335684582572737,
+        "p90_dz": 7.8563103974965545,
+        "argmax_bin0_frac": 0.24365234375
+      },
+      "cellq_std_across_cells_dz": 2.0709362030029297,
+      "cellq_std_across_states_dz": 0.6874142700145289,
+      "demo_minus_shift_dz": 1.098769045933763,
+      "demo_minus_shift_win": 1.0
+    }
+  }
+}
