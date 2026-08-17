@@ -1,0 +1,5 @@
+run,protocol,episode,episode_length,episode_reward,frame,step
+p1_mp_s1,eval_protocol_on,25,206.32,0.68,50261,50261.0
+p1_mp_s1,eval_protocol_off,25,210.28,0.64,50261,50261.0
+p2_pc_base_s1,eval_protocol_on,25,846.44,0.04,40387,40387.0
+p2_pc_base_s1,eval_protocol_off,25,850.0,0.0,40387,40387.0
