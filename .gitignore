@@ -10,3 +10,5 @@ tmp_demochk/
 .efc_*
 __pycache__/
 *.pyc
+__pycache__/
+*.pyc
