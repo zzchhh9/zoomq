@@ -578,6 +578,66 @@ def mode_perturb(env, demos, args):
     return out
 
 
+def mode_ensemble(env, demos, args, kind="linear"):
+    """Replay the j-knot skeleton THROUGH CQN-AS's temporal ensemble.
+
+    Every result above executes one chunk open loop, which is what ZoomQ does
+    (`temporal_ensemble: false` in config_zoomq_bigym.yaml, and
+    train_cqn_as_bigym.py:716 then replans only at episode_step % K == 0).
+    Phase 9 instead runs ZoomQ on the STOCK protocol, where the agent replans
+    EVERY step and utils.TemporalEnsembleControl blends the overlapping plans.
+    That is a different execution regime, so the open-loop ceiling measured here
+    does not transfer to it, and this mode measures the ceiling that does.
+
+    Faithful to utils.TemporalEnsembleControl as the CQN-AS trainer builds it
+    (train_cqn_as_bigym.py:277-283): gain is the constructor default 0.01 because
+    the trainer passes none, zero_safe defaults False so the "which rows count"
+    test is the legacy `np.all(cur_actions != 0, axis=1)`, and weights are
+    exp(-gain * i) with i=0 the OLDEST surviving plan.
+
+    A perfect policy is assumed, as everywhere else in Gate 1: the plan
+    registered at step t is the demo's own a[t:t+K], projected to j knots.
+    """
+    K = args.chunk_len
+    gain = float(getattr(args, "ensemble_gain", 0.01) or 0.01)
+    out = {}
+    for j in args.j:
+        knots = knots_for_j(j, K)
+        rows = []
+        for d in demos:
+            a = d["actions"]
+            T, D = a.shape
+            hist = np.zeros((T, T + K, D), dtype=np.float64)
+            reg = np.zeros(T, dtype=bool)
+            acts = np.empty_like(a)
+            n_empty = 0
+            for t in range(T):
+                chunk = a[t:t + K]
+                proj = project(chunk, knots, kind,
+                               tuple(getattr(args, "hold_dims", ()) or ()))
+                hist[t, t:t + len(proj)] = proj
+                reg[t] = True
+                cur = hist[:, t]
+                idx = np.all(cur != 0, axis=1)          # legacy zero_safe=False
+                ca = cur[idx]
+                if len(ca) == 0:
+                    acts[t] = 0.0
+                    n_empty += 1
+                    continue
+                w = np.exp(-gain * np.arange(len(ca), dtype=np.float64))
+                w = (w / w.sum())[:, None]
+                acts[t] = (ca * w).sum(0)
+            r = rollout(env, np.clip(acts, -1, 1), d["seed"])
+            r["skeleton_rmse"] = float(np.sqrt(np.mean((acts - a) ** 2)))
+            r["ensemble_empty_steps"] = int(n_empty)
+            rows.append(r)
+        out[str(j)] = {"rows": rows, "ensemble_gain": gain, **_agg(rows)}
+        print(f"    j={j:2d} ENSEMBLE success={out[str(j)]['success_rate']:.3f} "
+              f"rmse={out[str(j)]['mean_skeleton_rmse']:.4f} "
+              f"empty={sum(r['ensemble_empty_steps'] for r in rows)}", flush=True)
+    return out
+
+
 def mode_chunk(env, demos, args):
     """Per-chunk open-loop tracking error against the reference rollout."""
     inner = env._env
@@ -694,6 +754,8 @@ def _worker(payload):
             res = mode_full(env, demos, args, "linear")
         elif args.mode == "zoh":
             res = mode_full(env, demos, args, "zoh")
+        elif args.mode == "ensemble":
+            res = mode_ensemble(env, demos, args, "linear")
         elif args.mode == "chunk":
             res = mode_chunk(env, demos, args)
         elif args.mode == "perturb":
@@ -762,7 +824,7 @@ def main():
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--mode", default="full",
-                   choices=("raw", "full", "chunk", "zoh", "perturb"),
+                   choices=("raw", "full", "chunk", "zoh", "perturb", "ensemble"),
                    help="which Gate-1 step to run (see the module docstring)")
     p.add_argument("--era", default="floating", choices=tuple(ERAS),
                    help="env era: 'homie' = production ZoomQ config, "
@@ -796,6 +858,8 @@ def main():
     p.add_argument("--j", type=str, default="2,3,5,9,16",
                    help="comma-separated dyadic knot counts")
     p.add_argument("--chunk-len", type=int, default=CHUNK_LEN)
+    p.add_argument("--ensemble-gain", type=float, default=0.01,
+                   help="TemporalEnsembleControl gain; 0.01 is the trainer default")
     p.add_argument("--exact-prefix", type=int, default=0,
                    help="execute the first N demo actions verbatim, project the rest")
     p.add_argument("--phase", type=int, default=0,
