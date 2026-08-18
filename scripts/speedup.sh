@@ -110,7 +110,7 @@ STOCK="temporal_ensemble=true nstep=1"
 ppu=8
 relaunch() {
   local name="$1" seed="$2"; shift 2
-  env DEMO_HOME="$DEMO_HOME" SEED="$seed" EVAL_EVERY=2000 EVAL_EPS=25 WORKERS=3 \
+  env DEMO_HOME="$DEMO_HOME" SEED="$seed" EVAL_EVERY=2000 EVAL_EPS=25 WORKERS=${P9_WORKERS:-8} \
     setsid nohup ./scripts/launch_arm.sh "$name" "$ppu" config_zoomq_bigym \
       bigym_task=move_plate $FLOAT $STOCK \
       in_train_eval=false save_eval_snapshot=true "$@" \

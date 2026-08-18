@@ -31,6 +31,9 @@ set -uo pipefail
 cd /mnt/workspace/zoomq
 INTERVAL="${INTERVAL:-300}"
 MIN_FREE_GB="${MIN_FREE_GB:-150}"
+# An arm at or past this frame count is FINISHED and is never resumed.
+DONE_FRAMES="${DONE_FRAMES:-99000}"
+PY=/mnt/workspace/anchorq/.venv/bin/python
 export DEMO_HOME=/mnt/workspace/zoomq/demos
 
 # WHITELIST, not a blacklist. The previous version carried a CULLED blacklist and
@@ -52,6 +55,25 @@ while true; do
     [ -d "$d" ] || continue
     a=$(basename "$d")
     case "$KEEP" in *" $a "*) ;; *) continue ;; esac
+    # DONE means done. Without this the whitelist has no notion of an arm having
+    # finished, so a baseline that reached 100K frames gets resumed forever: it
+    # burns cores and render bandwidth to add nothing, and it silently undoes any
+    # deliberate stop. Twelve baselines were resurrected exactly this way after
+    # scripts/speedup.sh stopped them. Their data is already on disk, so "done"
+    # is a property of train.csv, not of the process.
+    # Parse the CSV by HEADER NAME, never by column index. `frame` is column 23,
+    # not 45 -- an earlier version of this check used awk -F, '{print $45}' and
+    # silently compared total_time (97991 seconds) against a frame threshold
+    # (99000). The two happened to be the same order of magnitude, so the guard
+    # never fired and twelve finished baselines were resumed forever.
+    f=$($PY -c "
+import csv, sys
+rs = list(csv.DictReader(open(sys.argv[1])))
+print(int(float(rs[-1]['frame'])) if rs else 0)
+" "$d/train.csv" 2>/dev/null || echo 0)
+    if [ "${f:-0}" -ge "${DONE_FRAMES:-99000}" ] 2>/dev/null; then
+      continue
+    fi
     # Alive? Match the TRAINER's own command line. A bare "/runs/$a" also matches
     # the eval daemons' `--path .../runs/$a` argument, which made dead arms look
     # alive during the OOM episode.
