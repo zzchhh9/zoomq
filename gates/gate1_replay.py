@@ -578,6 +578,50 @@ def mode_perturb(env, demos, args):
     return out
 
 
+def mode_execlen(env, demos, args, kind="linear"):
+    """Commit a j-knot 16-step skeleton, execute only the first E of it, replan.
+
+    This is the receding-horizon middle ground between the two regimes already
+    measured. ZoomQ today is E = K = 16 (commit the whole chunk open loop,
+    `temporal_ensemble: false`, train_cqn_as_bigym.py:716 replanning only at
+    episode_step % action_sequence == 0), which caps round 0 at 0.100. The stock
+    protocol is effectively E = 1 plus a blend over the 16 live plans, which
+    lifts round 0 to 0.617 -- but an agent replanning every step is not
+    committing a skeleton, so it cannot be stopping early on one either.
+
+    E in between keeps the commitment (and therefore the depth decision) while
+    paying only part of the open-loop cost. `execution_length` already exists as
+    a config knob for ACT/DEAS/diffusion in this repo (config_diffusion_bigym
+    ships E=8); train_cqn_as_bigym.py is the one trainer that hardcodes E=K.
+    Measuring the ceiling here says whether adding it is worth the change.
+
+    Perfect policy as everywhere else in Gate 1: the plan formed at step t is the
+    demo's own a[t:t+K], projected to j knots.
+    """
+    K = args.chunk_len
+    E = max(1, int(getattr(args, "exec_len", K) or K))
+    out = {}
+    for j in args.j:
+        knots = knots_for_j(j, K)
+        rows = []
+        for d in demos:
+            a = d["actions"]
+            T = len(a)
+            acts = np.empty_like(a)
+            for t in range(0, T, E):
+                proj = project(a[t:t + K], knots, kind,
+                               tuple(getattr(args, "hold_dims", ()) or ()))
+                e = min(E, T - t)
+                acts[t:t + e] = proj[:e]
+            r = rollout(env, np.clip(acts, -1, 1), d["seed"])
+            r["skeleton_rmse"] = float(np.sqrt(np.mean((acts - a) ** 2)))
+            rows.append(r)
+        out[str(j)] = {"rows": rows, "exec_len": E, **_agg(rows)}
+        print(f"    j={j:2d} E={E:2d} success={out[str(j)]['success_rate']:.3f} "
+              f"rmse={out[str(j)]['mean_skeleton_rmse']:.4f}", flush=True)
+    return out
+
+
 def mode_ensemble(env, demos, args, kind="linear"):
     """Replay the j-knot skeleton THROUGH CQN-AS's temporal ensemble.
 
@@ -754,6 +798,8 @@ def _worker(payload):
             res = mode_full(env, demos, args, "linear")
         elif args.mode == "zoh":
             res = mode_full(env, demos, args, "zoh")
+        elif args.mode == "execlen":
+            res = mode_execlen(env, demos, args, "linear")
         elif args.mode == "ensemble":
             res = mode_ensemble(env, demos, args, "linear")
         elif args.mode == "chunk":
@@ -824,7 +870,7 @@ def main():
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--mode", default="full",
-                   choices=("raw", "full", "chunk", "zoh", "perturb", "ensemble"),
+                   choices=("raw", "full", "chunk", "zoh", "perturb", "ensemble", "execlen"),
                    help="which Gate-1 step to run (see the module docstring)")
     p.add_argument("--era", default="floating", choices=tuple(ERAS),
                    help="env era: 'homie' = production ZoomQ config, "
@@ -858,6 +904,9 @@ def main():
     p.add_argument("--j", type=str, default="2,3,5,9,16",
                    help="comma-separated dyadic knot counts")
     p.add_argument("--chunk-len", type=int, default=CHUNK_LEN)
+    p.add_argument("--exec-len", type=int, default=16,
+                   help="execute this many steps of each committed skeleton "
+                        "before replanning (mode=execlen); 16 == today")
     p.add_argument("--ensemble-gain", type=float, default=0.01,
                    help="TemporalEnsembleControl gain; 0.01 is the trainer default")
     p.add_argument("--exact-prefix", type=int, default=0,
