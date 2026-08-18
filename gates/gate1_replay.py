@@ -179,13 +179,27 @@ def project(chunk: np.ndarray, knots: list[int], kind: str = "linear",
 
 
 def project_sequence(actions: np.ndarray, j: int, kind: str = "linear",
-                     chunk_len: int = CHUNK_LEN, hold_dims: tuple = ()) -> np.ndarray:
-    """Project a whole action sequence, chunk by chunk (non-overlapping)."""
+                     chunk_len: int = CHUNK_LEN, hold_dims: tuple = (),
+                     phase: int = 0) -> np.ndarray:
+    """Project a whole action sequence, chunk by chunk (non-overlapping).
+
+    ``phase`` slides the CHUNK GRID without changing which actions are
+    executed or how many: boundaries land on ``phase, phase+K, phase+2K, ...``
+    and the leading ``phase`` actions form one short chunk.  A deployed agent
+    does not choose its phase relative to the task -- the grid is set by when
+    the episode happens to start and when it replans -- so sweeping this is the
+    only way to read how much of a skeleton's success is the skeleton and how
+    much is a lucky alignment between a knot and the moment that matters.
+    """
     knots = knots_for_j(j, chunk_len)
     out = np.empty_like(actions)
-    for s in range(0, len(actions), chunk_len):
-        out[s:s + chunk_len] = project(actions[s:s + chunk_len], knots, kind,
-                                       hold_dims)
+    ph = int(phase) % chunk_len
+    starts = ([0] if ph else []) + list(range(ph, len(actions), chunk_len))
+    for s in starts:
+        e = min(s + (chunk_len if s or not ph else ph), len(actions))
+        if e <= s:
+            continue
+        out[s:e] = project(actions[s:e], knots, kind, hold_dims)
     return out
 
 
@@ -460,13 +474,54 @@ def mode_full(env, demos, args, kind="linear"):
     for j in args.j:
         rows = []
         for d in demos:
-            acts = project_sequence(d["actions"], j, kind, args.chunk_len,
-                                    tuple(getattr(args, "hold_dims", ()) or ()))
+            src = d["actions"]
+            sigma = float(getattr(args, "knot_noise", 0.0) or 0.0)
+            if sigma > 0.0:
+                # THE ERROR BUDGET. Gate 1's spec asks for this and it was never
+                # run: "re-execute with knots perturbed ... since the trained
+                # critic will not commit DP-optimal skeletons; the resulting
+                # cliff is the error budget the critic must live inside."
+                #
+                # Perturb EVERY knot (not one per chunk, as --mode perturb does)
+                # by N(0, sigma) before projecting, so the interpolant is built
+                # from the perturbed knots exactly as a trained critic's would
+                # be. Reference points: a snapshot probe measured selected-knot
+                # MAE against the demonstrations at 0.049 for ZoomQ and 0.008 for
+                # the CQN-AS baseline, so sweeping sigma across that range says
+                # whether ZoomQ's knot precision alone can explain its zero.
+                # Seeded from the demo's own reset seed so a sweep is repeatable.
+                rng = np.random.default_rng(args.seed * 7919 + d["seed"])
+                src = src.copy()
+                kn = knots_for_j(j, args.chunk_len)
+                for st in range(0, len(src), args.chunk_len):
+                    for k in kn:
+                        t = st + k
+                        if t < len(src):
+                            src[t] = src[t] + rng.normal(0.0, sigma, size=src.shape[1])
+                src = np.clip(src, -1.0, 1.0)
+            acts = project_sequence(src, j, kind, args.chunk_len,
+                                    tuple(getattr(args, "hold_dims", ()) or ()),
+                                    phase=int(getattr(args, "phase", 0) or 0))
+            # THE EXACT PREFIX. The phase sweep showed success is set by whether
+            # the first few control steps after reset are reproduced exactly
+            # (phases 1-5, which give a short dense leading chunk, score
+            # 0.78-0.88 at j=3; phases 0 and 6-14, which do not, score
+            # 0.32-0.57) -- and not by any periodic alignment. This isolates
+            # that directly: execute the first N demo actions verbatim and
+            # project everything after them.
+            npre = int(getattr(args, "exact_prefix", 0) or 0)
+            if npre > 0:
+                acts = acts.copy()
+                acts[:npre] = src[:npre]
             r = rollout(env, np.clip(acts, -1, 1), d["seed"])
             r["skeleton_rmse"] = float(np.sqrt(np.mean(
                 (acts - d["actions"]) ** 2)))
             rows.append(r)
-        out[str(j)] = {"rows": rows, **_agg(rows)}
+        out[str(j)] = {"rows": rows,
+                       "knot_noise": float(getattr(args, "knot_noise", 0.0) or 0.0),
+                       "phase": int(getattr(args, "phase", 0) or 0),
+                       "exact_prefix": int(getattr(args, "exact_prefix", 0) or 0),
+                       **_agg(rows)}
         print(f"    j={j:2d} success={out[str(j)]['success_rate']:.3f} "
               f"mean_reward={out[str(j)]['mean_reward']:.3f} "
               f"skeleton_rmse={out[str(j)]['mean_skeleton_rmse']:.4f}", flush=True)
@@ -741,6 +796,17 @@ def main():
     p.add_argument("--j", type=str, default="2,3,5,9,16",
                    help="comma-separated dyadic knot counts")
     p.add_argument("--chunk-len", type=int, default=CHUNK_LEN)
+    p.add_argument("--exact-prefix", type=int, default=0,
+                   help="execute the first N demo actions verbatim, project the rest")
+    p.add_argument("--phase", type=int, default=0,
+                   help="slide the chunk grid by this many steps (0..K-1); "
+                        "changes alignment only, not which actions execute")
+    p.add_argument("--knot-noise", type=float, default=0.0,
+                   help="stddev of Gaussian noise added to EVERY knot before "
+                        "projection, in normalised action units. The error "
+                        "budget sweep Gate 1 specifies. Reference: measured "
+                        "selected-knot MAE is 0.049 for ZoomQ and 0.008 for the "
+                        "CQN-AS baseline.")
     p.add_argument("--hold-dims", type=str, default="",
                    help="comma-separated action dims that get a ZERO-ORDER "
                         "HOLD instead of the linear fill, mirroring "
