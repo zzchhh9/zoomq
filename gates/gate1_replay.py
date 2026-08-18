@@ -644,6 +644,8 @@ def mode_ensemble(env, demos, args, kind="linear"):
     """
     K = args.chunk_len
     gain = float(getattr(args, "ensemble_gain", 0.01) or 0.01)
+    sigma = float(getattr(args, "knot_noise", 0.0) or 0.0)
+    nmodel = str(getattr(args, "knot_noise_model", "indep") or "indep")
     out = {}
     for j in args.j:
         knots = knots_for_j(j, K)
@@ -651,12 +653,40 @@ def mode_ensemble(env, demos, args, kind="linear"):
         for d in demos:
             a = d["actions"]
             T, D = a.shape
+            # THE ENSEMBLE ERROR BUDGET.  --knot-noise was only ever wired into
+            # mode_full, i.e. measured OPEN LOOP.  The stock protocol replans
+            # every step and blends ~K overlapping plans, so an open-loop cliff
+            # does not transfer.  Here every plan the agent registers is built
+            # from knots perturbed by N(0, sigma), exactly as an inaccurate
+            # critic's would be.  Two noise models, because the ensemble's
+            # averaging behaviour depends entirely on which one you believe:
+            #   indep -- each replan draws fresh knot errors, so the K
+            #            overlapping plans average them down (~1/sqrt(K)).
+            #            Lower bound on the damage.
+            #   time  -- one noise field indexed by ABSOLUTE time; a knot
+            #            landing on step tau always carries the same error no
+            #            matter which plan proposed it, so a systematic
+            #            (state-independent) critic error does not average out.
+            #            Upper bound on the damage.
+            # Seeded from the demo's own reset seed, as in mode_full, so the
+            # draw is independent of how demos are sharded across workers.
+            rng = np.random.default_rng(args.seed * 7919 + d["seed"])
+            field = (rng.normal(0.0, sigma, size=(T + K + 1, D))
+                     if (sigma > 0.0 and nmodel == "time") else None)
             hist = np.zeros((T, T + K, D), dtype=np.float64)
             reg = np.zeros(T, dtype=bool)
             acts = np.empty_like(a)
             n_empty = 0
             for t in range(T):
                 chunk = a[t:t + K]
+                if sigma > 0.0:
+                    m = chunk.shape[0]
+                    ks = sorted({0, m - 1} | {k for k in knots if k < m})
+                    chunk = chunk.copy()
+                    for k in ks:
+                        chunk[k] = chunk[k] + (field[t + k] if field is not None
+                                               else rng.normal(0.0, sigma, size=D))
+                    chunk = np.clip(chunk, -1.0, 1.0)
                 proj = project(chunk, knots, kind,
                                tuple(getattr(args, "hold_dims", ()) or ()))
                 hist[t, t:t + len(proj)] = proj
@@ -675,7 +705,9 @@ def mode_ensemble(env, demos, args, kind="linear"):
             r["skeleton_rmse"] = float(np.sqrt(np.mean((acts - a) ** 2)))
             r["ensemble_empty_steps"] = int(n_empty)
             rows.append(r)
-        out[str(j)] = {"rows": rows, "ensemble_gain": gain, **_agg(rows)}
+        out[str(j)] = {"rows": rows, "ensemble_gain": gain,
+                       "knot_noise": sigma, "knot_noise_model": nmodel,
+                       **_agg(rows)}
         print(f"    j={j:2d} ENSEMBLE success={out[str(j)]['success_rate']:.3f} "
               f"rmse={out[str(j)]['mean_skeleton_rmse']:.4f} "
               f"empty={sum(r['ensemble_empty_steps'] for r in rows)}", flush=True)
@@ -920,6 +952,15 @@ def main():
                         "budget sweep Gate 1 specifies. Reference: measured "
                         "selected-knot MAE is 0.049 for ZoomQ and 0.008 for the "
                         "CQN-AS baseline.")
+    p.add_argument("--knot-noise-model", default="indep",
+                   choices=("indep", "time"),
+                   help="mode=ensemble only: how --knot-noise correlates "
+                        "across the overlapping replans. 'indep' redraws every "
+                        "knot at every replan (the ensemble averages the error "
+                        "down); 'time' draws one noise field over absolute "
+                        "time, so a knot on step tau carries the same error in "
+                        "every plan that proposes it (no averaging). No effect "
+                        "when --knot-noise is 0.")
     p.add_argument("--hold-dims", type=str, default="",
                    help="comma-separated action dims that get a ZERO-ORDER "
                         "HOLD instead of the linear fill, mirroring "
