@@ -1,23 +1,28 @@
 #!/bin/bash
-# The phase-12 gate, instrumented so a null is READABLE rather than blind.
+# The phase-12 gate. Two rules it exists to enforce, both learned the hard way.
 #
 #   ./scripts/p12_gate.sh
 #
-# WHY THE EXTRA COLUMNS. p12 widens rounds 1-4 (w_schedule 1.0/0.2/0.2/0.2/0.2) but
-# leaves ROUND 0 at w=1.0 -- and the stopping rule is dead (delta_over_kappa_u p90
-# 0.0000, depth_share_1..4 all sitting on the annealed eps floor), so training
-# rollouts execute the round-0 two-knot fill. Success therefore lives on round 0
-# while the treatment lives on rounds 1-4. Chunk MAE averages all rounds, so the
-# treatment can open deep-round level 2, drop MAE, and still print zqEA's 4,7.
+# RULE 1 -- COMPARE AT MATCHED FRAMES. eps_depth anneals 0.3 -> 0.05 over 20000
+# steps, so depth_share_0 and the clamp rates move on their own. At 1200 frames
+# p12_mp_zqEAw_s1 and p9_mp_zqEA_s1 report depth_share_0 = 0.7384001855055491,
+# bit-identical -- while p9 at 25401 frames reads 0.8876 purely because eps reached
+# 0.05. An earlier version of this script printed p12@1200 beside p9@25401 and read
+# the difference as a treatment effect. It is not. Same for the clamp: matched at
+# 1200 frames, window_clamp_rate_4 is 0.01550 (p9) vs 0.00172 (p12), a 9.0x drop --
+# not the 16x that the mismatched pair suggested.
 #
-# So the success count alone cannot tell "the lattice was not the constraint" from
-# "the treatment never reached the thing that decides success". These four do:
-#   spread_r0_L2_atoms  did round 0's finest level open at all?   (zqEA: 0.0027)
-#   binacc_r0_L2        can it pick the demo's bin there?         (zqEA: 0.494,
-#                       CQN-AS 0.916, chance 0.20)
-#   window_clamp_rate_* did widening actually change the clamping?
-#   depth_share_0       is round 0 still what executes?           (zqEA: ~0.89)
-# A pretty level 2 with a flat round 0 is a blind null, not a clean one.
+# RULE 2 -- spread_r0_L2 AND binacc_r0_L2 ARE NOT IN train.csv. They come from a
+# snapshot probe. save_eval_snapshot=false for these arms, but snapshot.pt is live
+# and gates/../critic_localize.py reads it, so the column is obtainable -- it just
+# has to be computed, not looked up.
+#
+# WHY THOSE TWO COLUMNS DECIDE THE NULL. p12 widens rounds 1-4 and leaves ROUND 0 at
+# w=1.0. The stopping rule is dead (delta_over_kappa_u p90 = 0.0000), so rollouts
+# execute the round-0 two-knot fill: success lives on round 0, the treatment lives on
+# rounds 1-4. A flat round-0 level 2 with a pretty deep-round one is a BLIND null.
+# Reference: zqEA spread_r0_L2 0.0027 / binacc_r0_L2 0.494; CQN-AS L2 4.42 / 0.916;
+# chance 0.20.
 set -uo pipefail
 cd /mnt/workspace/zoomq
 PY=/mnt/workspace/anchorq/.venv/bin/python
@@ -25,10 +30,10 @@ PY=/mnt/workspace/anchorq/.venv/bin/python
 echo "=== 1. successes at the pre-registered cut (first 45 episodes) ==="
 $PY - <<'PYEOF'
 import csv, glob, os
-groups = [("baseline stock", "runs/p1_mp_s*"), ("", "runs/rep_movepl"),
+groups = [("baseline stock", "runs/p1_mp_s*"), ("baseline stock", "runs/rep_movepl"),
           ("zqEA (control)", "runs/p9_mp_zqEA_s*"),
           ("zqEAw (p12)", "runs/p12_mp_zqEAw_s*")]
-print("  %-22s %-20s %5s %8s %8s" % ("group", "arm", "eps", "succ@45", "succ@90"))
+print("  %-16s %-20s %5s %8s %8s  %s" % ("group", "arm", "eps", "succ@45", "succ@90", "first success at ep"))
 pooled = {}
 for tag, pat in groups:
     for d in sorted(glob.glob(pat)):
@@ -37,53 +42,93 @@ for tag, pat in groups:
             continue
         ep = [float(r["episode_reward"]) for r in csv.DictReader(open(f))
               if r.get("episode_reward") not in (None, "")]
+        nz = [i + 1 for i, x in enumerate(ep) if x > 0]
         s45 = sum(1 for x in ep[:45] if x > 0) if len(ep) >= 45 else None
         s90 = sum(1 for x in ep[:90] if x > 0) if len(ep) >= 90 else None
-        print("  %-22s %-20s %5d %8s %8s" % (tag, os.path.basename(d), len(ep),
-              s45 if s45 is not None else "-", s90 if s90 is not None else "-"))
-        if s45 is not None and tag:
+        print("  %-16s %-20s %5d %8s %8s  %s" % (tag, os.path.basename(d), len(ep),
+              s45 if s45 is not None else "-", s90 if s90 is not None else "-",
+              nz[0] if nz else "-"))
+        if s45 is not None:
             pooled.setdefault(tag, []).append(s45)
         tag = ""
 print()
 for k, v in pooled.items():
     if len(v) >= 2:
-        print("  pooled@45  %-18s %d / %d" % (k, sum(v), 45 * len(v)))
+        print("  pooled@45  %-16s %d / %d" % (k, sum(v), 45 * len(v)))
 print()
-print("  RULE (vs zqEA's own 11/90):  >=20 lattice was binding | <=11 null | 12-19 inconclusive")
+print("  RULE vs zqEA's own 11/90:  >=20 lattice was binding | <=11 null | 12-19 inconclusive")
+print("  A single early success is NOT a signal -- zqEA's own first lands at episode 20-21.")
 PYEOF
 
 echo
-echo "=== 2. did the treatment reach anything? (train.csv, by header name) ==="
+echo "=== 2. did the treatment reach rounds 1-4? MATCHED FRAMES ONLY ==="
 $PY - <<'PYEOF'
 import csv, glob, os
 COLS = ["depth_share_0", "window_clamp_rate_1", "window_clamp_rate_2",
-        "window_clamp_rate_3", "window_clamp_rate_4", "delta_over_kappa_u_p90",
-        "zoomq_refine_loss", "zoomq_exec_loss"]
-def last(rs, c):
-    for r in reversed(rs):
-        v = r.get(c, "")
-        if v not in ("", None):
-            try: return float(v)
-            except ValueError: return None
-    return None
-print("  %-20s %8s %s" % ("arm", "frame", " ".join("%18s" % c[:18] for c in COLS)))
-for d in sorted(glob.glob("runs/p12_mp_zqEAw_s*")) + sorted(glob.glob("runs/p9_mp_zqEA_s*")):
+        "window_clamp_rate_3", "window_clamp_rate_4", "delta_over_kappa_u_p90"]
+def row_near(f, target, tol=400):
+    best = None
+    for r in csv.DictReader(open(f)):
+        try: fr = int(float(r.get("frame") or 0))
+        except ValueError: continue
+        if abs(fr - target) <= tol and (best is None or abs(fr - target) < abs(best[0] - target)):
+            best = (fr, r)
+    return best
+
+arms = sorted(glob.glob("runs/p12_mp_zqEAw_s*")) + sorted(glob.glob("runs/p9_mp_zqEA_s*"))
+frames = []
+for d in arms:
     f = os.path.join(d, "train.csv")
-    if not os.path.exists(f):
-        continue
-    rs = list(csv.DictReader(open(f)))
-    fr = last(rs, "frame")
-    vals = [last(rs, c) for c in COLS]
-    print("  %-20s %8d %s" % (os.path.basename(d), int(fr or 0),
-          " ".join("%18s" % (("%.4f" % v) if v is not None else "-") for v in vals)))
+    if os.path.exists(f):
+        rs = [int(float(r["frame"])) for r in csv.DictReader(open(f)) if r.get("frame")]
+        if rs: frames.append(max(rs))
+target = min(frames) if frames else 1200
+print("  comparing every arm at ~%d frames (the least-advanced arm's frontier)" % target)
+print("  %-20s %7s %s" % ("arm", "frame", " ".join("%14s" % c[-14:] for c in COLS)))
+for d in arms:
+    f = os.path.join(d, "train.csv")
+    if not os.path.exists(f): continue
+    b = row_near(f, target)
+    if not b:
+        print("  %-20s   (no row near %d)" % (os.path.basename(d), target)); continue
+    fr, r = b
+    def fmt(c):
+        # Format as a float. String-truncating these once chopped the "e-05" off
+        # delta_over_kappa_u_p90 and made 1.27e-05 read as 1.27 -- i.e. a dead
+        # stopping rule reading as one that fires.
+        v = r.get(c)
+        if v in (None, ""):
+            return "-"
+        try:
+            x = float(v)
+        except ValueError:
+            return str(v)[:14]
+        return ("%14.4g" % x).strip()
+    print("  %-20s %7d %s" % (os.path.basename(d), fr,
+          " ".join("%14s" % fmt(c) for c in COLS)))
+print()
+print("  depth_share_0 and the clamp rates are eps-driven; they are ONLY comparable")
+print("  between arms at the same frame. Never read them across different frames.")
 PYEOF
 
 echo
-echo "=== 3. round-0 level-2, the column the success count cannot substitute for ==="
-echo "    (needs the snapshot probe; reference zqEA spread_r0_L2 0.0027 / binacc_r0_L2 0.494,"
-echo "     CQN-AS L2 4.42 / 0.916, chance 0.20)"
-if [ -f /root/gap/critic_localize.py ]; then
-  echo "    run:  OMP_NUM_THREADS=8 $PY /root/gap/critic_localize.py  (point it at runs/p12_mp_zqEAw_s1/snapshot.pt)"
-else
-  echo "    /root/gap/critic_localize.py is gone -- rebuild it before reading the gate"
+echo "=== 3. round-0 level 2 -- computed from snapshot.pt, not looked up in train.csv ==="
+PROBE=/root/gap/critic_localize.py
+if [ ! -f "$PROBE" ]; then
+  echo "  MISSING $PROBE -- rebuild it before reading this gate; the success count alone"
+  echo "  cannot tell a real null from a treatment that never reached round 0."
+  exit 1
 fi
+for a in p12_mp_zqEAw_s1 p12_mp_zqEAw_s2; do
+  s="runs/$a/snapshot.pt"
+  if [ -f "$s" ]; then
+    printf "  %-20s snapshot.pt %s bytes, mtime %s\n" "$a" \
+      "$(stat -c %s "$s")" "$(stat -c %y "$s" | cut -c1-19)"
+  else
+    printf "  %-20s snapshot.pt MISSING\n" "$a"
+  fi
+done
+echo "  run:  set +eu; source /usr/local/PPU_SDK/envsetup.sh >/dev/null 2>&1; set -eu"
+echo "        HOME=/mnt/workspace/zoomq/demos PYTHONUSERBASE=/root/.local OMP_NUM_THREADS=8 \\"
+echo "        $PY $PROBE   # point it at runs/p12_mp_zqEAw_s1/snapshot.pt"
+echo "  reference: zqEA spread_r0_L2 0.0027 / binacc_r0_L2 0.494 | CQN-AS 4.42 / 0.916 | chance 0.20"
